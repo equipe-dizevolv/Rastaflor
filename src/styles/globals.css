@@ -1,0 +1,293 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  --font-family: 'Inter', sans-serif;
+  
+  /* Light Mode Design System for Environmental Restoration Platform */
+  --background: #F8F8F8; /* Light gray background */
+  --foreground: #1A1A1A; /* Dark text for primary content */
+  --card: #FFFFFF; /* White cards */
+  --card-foreground: #1A1A1A;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A1A;
+  --primary: #0F3D26; /* Dark green for CTAs */
+  --primary-foreground: #FAFAFA;
+  --secondary: #777777; /* Medium gray for secondary text */
+  --secondary-foreground: #1A1A1A;
+  --muted: #F8F8F8;
+  --muted-foreground: #777777;
+  --accent: #0F3D26;
+  --accent-foreground: #FAFAFA;
+  --destructive: #EF4444;
+  --destructive-foreground: #FAFAFA;
+  --border: #E0E0E0; /* Subtle border */
+  --input: #FFFFFF; /* White input background */
+  --input-background: #FFFFFF;
+  --switch-background: #E0E0E0;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #0F3D26;
+  --chart-1: #0F3D26;
+  --chart-2: #60A5FA;
+  --chart-3: #F472B6;
+  --chart-4: #FBBF24;
+  --chart-5: #A78BFA;
+  --radius: 0.75rem; /* 12px radius as specified */
+  
+  /* Sidebar colors - Light Mode */
+  --sidebar: #FFFFFF; /* White sidebar */
+  --sidebar-foreground: #1A1A1A; /* Dark text */
+  --sidebar-primary: #0F3D26;
+  --sidebar-primary-foreground: #FAFAFA;
+  --sidebar-accent: #0F3D26; /* Active link background */
+  --sidebar-accent-foreground: #FAFAFA; /* Active link text */
+  --sidebar-border: #E0E0E0;
+  --sidebar-ring: #0F3D26;
+}
+
+.dark {
+  /* Dark Mode - Paleta padronizada baseada no Módulo de Coleta */
+  --background: #121714; /* Cinza/verde muito escuro - Fundo da Página (Módulo de Coleta) */
+  --foreground: #EAEAEA; /* Texto principal */
+  --card: #1E2621; /* Cinza esverdeado - Fundo dos Cartões (um pouco mais claro que o background) */
+  --card-foreground: #FFFFFF; /* Texto dos cartões */
+  --popover: #1E2621;
+  --popover-foreground: #EAEAEA;
+  --primary: #0F3D26; /* Verde escuro da marca - Botões primários */
+  --primary-foreground: #FFFFFF; /* Texto branco nos botões primários */
+  --secondary: #A0A0A0; /* Cinza médio para texto secundário */
+  --secondary-foreground: #EAEAEA;
+  --muted: #1E2621;
+  --muted-foreground: #A0A0A0;
+  --accent: #0F3D26; /* Verde escuro da marca */
+  --accent-foreground: #FFFFFF;
+  --destructive: #EF4444;
+  --destructive-foreground: #EAEAEA;
+  --border: rgba(160, 160, 160, 0.2); /* Bordas sutis do Módulo de Coleta */
+  --input: #1E2621; /* Input background igual aos cards */
+  --input-background: #1E2621;
+  --switch-background: rgba(160, 160, 160, 0.3);
+  --ring: #0F3D26;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: #34D399;
+  --chart-2: #60A5FA;
+  --chart-3: #F472B6;
+  --chart-4: #FBBF24;
+  --chart-5: #A78BFA;
+  --sidebar: #0F3D26; /* Verde escuro da marca - Sidebar do Módulo de Coleta */
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #FFFFFF;
+  --sidebar-primary-foreground: #0F3D26;
+  --sidebar-accent: rgba(255, 255, 255, 0.1);
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(160, 160, 160, 0.1);
+  --sidebar-ring: #34D399;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-family);
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: 2rem; /* 32px as specified */
+      font-weight: 700; /* Bold for h1 */
+      line-height: 1.5;
+    }
+
+    h2 {
+      font-size: 1.5rem; /* 24px as specified */
+      font-weight: 700; /* Bold for h2 */
+      line-height: 1.5;
+    }
+
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h4 {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+/* Print styles for reports */
+@media print {
+  @page {
+    margin: 1in;
+    size: A4;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  
+  .print\:hidden {
+    display: none !important;
+  }
+  
+  .print\:block {
+    display: block !important;
+  }
+  
+  .print\:break-inside-avoid {
+    break-inside: avoid !important;
+  }
+  
+  .print\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  
+  .print\:gap-4 {
+    gap: 1rem !important;
+  }
+  
+  .print\:text-lg {
+    font-size: 1.125rem !important;
+  }
+  
+  .print\:border-0 {
+    border: 0 !important;
+  }
+  
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+  
+  .print\:hover\:bg-transparent:hover {
+    background-color: transparent !important;
+  }
+  
+  /* Ensure cards and sections are properly spaced in print */
+  .print\:mb-6 {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Make charts and interactive elements print-friendly */
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Ensure text contrast in print */
+  h1, h2, h3, h4, h5, h6 {
+    color: black !important;
+    page-break-after: avoid;
+  }
+  
+  p, td, th {
+    color: black !important;
+  }
+  
+  .text-secondary {
+    color: #666 !important;
+  }
+  
+  .text-primary {
+    color: #059669 !important;
+  }
+  
+  /* Table improvements for print */
+  table {
+    page-break-inside: avoid;
+  }
+  
+  thead {
+    display: table-header-group;
+  }
+  
+  tr {
+    page-break-inside: avoid;
+  }
+}
