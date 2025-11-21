@@ -2,9 +2,13 @@ import { useState } from 'react';
 import { ContractTable } from '../contracts/ContractTable';
 import { Button } from '../ui/button';
 import { Plus } from 'lucide-react';
+import { CadastrarContratoModal, ContratoFormData } from '../modals/CadastrarContratoModal';
 
 export function Contracts() {
-  const [contracts] = useState([
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFornecedorModalOpen, setIsFornecedorModalOpen] = useState(false);
+  
+  const [contracts, setContracts] = useState([
     {
       id: '1',
       name: 'Contrato de Restauração - Fazenda São José',
@@ -36,7 +40,29 @@ export function Contracts() {
   ]);
 
   const handleCreateContract = () => {
-    console.log('Criar novo contrato');
+    setIsModalOpen(true);
+  };
+
+  const handleSaveContract = (formData: ContratoFormData) => {
+    const newContract = {
+      id: Date.now().toString(),
+      name: formData.nomeArquivo,
+      createdBy: 'Usuário Atual', // In a real app, this would come from auth
+      date: new Date().toLocaleDateString('pt-BR'),
+      fileName: formData.arquivo?.name || 'documento.pdf'
+    };
+    
+    setContracts([newContract, ...contracts]);
+  };
+
+  const handleCreateFornecedor = () => {
+    setIsModalOpen(false);
+    setIsFornecedorModalOpen(true);
+  };
+
+  const handleCloseFornecedorModal = () => {
+    setIsFornecedorModalOpen(false);
+    setIsModalOpen(true);
   };
 
   const handleDownloadContract = (contractId: string) => {
@@ -48,7 +74,9 @@ export function Contracts() {
   };
 
   const handleDeleteContract = (contractId: string) => {
-    console.log('Delete contract:', contractId);
+    if (confirm('Tem certeza que deseja excluir este contrato?')) {
+      setContracts(contracts.filter(c => c.id !== contractId));
+    }
   };
 
   return (
@@ -75,6 +103,40 @@ export function Contracts() {
         onEdit={handleEditContract}
         onDelete={handleDeleteContract}
       />
+
+      {/* Modal Cadastrar Contrato */}
+      <CadastrarContratoModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveContract}
+        onCreateFornecedor={handleCreateFornecedor}
+      />
+
+      {/* Modal Criar Fornecedor (Placeholder) */}
+      {isFornecedorModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-card rounded-[12px] shadow-xl w-full max-w-md p-6">
+            <h2 className="text-[#1A1A1A] dark:text-white mb-4">Criar Novo Fornecedor</h2>
+            <p className="text-sm text-[#777777] dark:text-[#B0B0B0] mb-4">
+              Modal de criação de fornecedor será implementado aqui
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsFornecedorModalOpen(false)}
+                className="flex-1 px-4 py-2 bg-white dark:bg-transparent border border-[#E0E0E0] dark:border-border text-[#1A1A1A] dark:text-white rounded-[8px] hover:bg-[#F8F8F8] dark:hover:bg-[#2A2A2A] transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCloseFornecedorModal}
+                className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-[8px] hover:bg-primary/90 transition-colors"
+              >
+                Voltar para Contrato
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

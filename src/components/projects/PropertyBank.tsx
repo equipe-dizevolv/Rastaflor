@@ -7,39 +7,32 @@ import { PropertyCard } from './PropertyCard';
 import { EditPropertyModal } from '../properties/EditPropertyModal';
 import { Search, Plus, Activity } from 'lucide-react';
 
-interface PropertyArea {
-  name: string;
-  degradation: string;
-  slope: string;
-  type: string;
-  size: string;
-}
-
-interface Property {
+interface PropertyData {
   id: string;
   name: string;
-  legalResponsible: string;
-  totalSize: string;
   location: string;
-  areas: PropertyArea[];
-  plantingStatus: 'pending' | 'in-progress' | 'completed';
-  composition: string;
+  area: number;
+  stage: string;
+  status: 'active' | 'inactive';
+  lastUpdate: string;
 }
 
 interface PropertyBankProps {
-  properties: Property[];
-  onEditProperty: (id: string) => void;
-  onRegisterPlanting: (id: string) => void;
-  onRegisterActivity: () => void;
-  onAddProperty: () => void;
+  properties?: any[];
+  onEditProperty?: (propertyId: string) => void;
+  onRegisterPlanting?: (propertyId: string) => void;
+  onRegisterActivity?: () => void;
+  onAddProperty?: () => void;
+  onPageChange?: (page: string) => void;
 }
 
-export function PropertyBank({
-  properties,
-  onEditProperty,
-  onRegisterPlanting,
+export function PropertyBank({ 
+  properties = [], 
+  onEditProperty, 
+  onRegisterPlanting, 
   onRegisterActivity,
-  onAddProperty
+  onAddProperty, 
+  onPageChange 
 }: PropertyBankProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [compositionFilter, setCompositionFilter] = useState('all');
@@ -191,7 +184,7 @@ export function PropertyBank({
               Registrar Atividade
             </Button>
             <Button
-              onClick={onAddProperty}
+              onClick={() => onPageChange ? onPageChange('add-property') : onAddProperty?.()}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <Plus className="w-4 h-4 mr-2" />

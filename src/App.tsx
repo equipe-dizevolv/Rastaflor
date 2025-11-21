@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
+import { Login } from './components/auth/Login';
 import { Dashboard } from './components/pages/Dashboard';
+import { DashboardColeta } from './components/pages/DashboardColeta';
 import { Projects } from './components/pages/Projects';
 import { ProjectDetails } from './components/pages/ProjectDetails';
 import { Tasks } from './components/pages/Tasks';
@@ -10,7 +12,17 @@ import { Invoices } from './components/pages/Invoices';
 import { Reports } from './components/pages/Reports';
 import { Settings } from './components/pages/Settings';
 import { Properties } from './components/pages/Properties';
+import { PropriedadesColeta } from './components/pages/PropriedadesColeta';
 import { AddProperty } from './components/pages/AddProperty';
+import { Especies } from './components/pages/Especies';
+import { EspeciesColeta } from './components/pages/EspeciesColeta';
+import { Coletas } from './components/pages/Coletas';
+import { Monitoramentos } from './components/pages/Monitoramentos';
+import { Rotulos } from './components/pages/Rotulos';
+import { Equipe } from './components/pages/Equipe';
+import { RelatoriosColeta } from './components/pages/RelatoriosColeta';
+import { RelatorioPreview } from './components/pages/RelatorioPreview';
+import { AddPropertyModal, PropertyFormData } from './components/modals/AddPropertyModal';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,14 +33,51 @@ import {
 } from "./components/ui/breadcrumb";
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentModule, setCurrentModule] = useState<'restauracao' | 'coleta'>('restauracao');
+  const [isAddPropertyModalOpen, setIsAddPropertyModalOpen] = useState(false);
+
+  // Define o favicon e título da página
+  useEffect(() => {
+    // Atualiza o título da página
+    document.title = 'RastaFlor - Gestão de Restauração Ambiental';
+    
+    // Atualiza o favicon
+    let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.getElementsByTagName('head')[0].appendChild(link);
+    }
+    link.href = '/rastaflor-logo.png';
+  }, []);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  // Se não estiver autenticado, mostra a tela de login
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   const handleModuleChange = (module: 'restauracao' | 'coleta') => {
     setCurrentModule(module);
     // Reset to dashboard when switching modules
     setCurrentPage('dashboard');
+  };
+
+  const handleAddPropertyClick = () => {
+    setIsAddPropertyModalOpen(true);
+  };
+
+  const handleSaveProperty = (formData: PropertyFormData) => {
+    // This would normally save to a database
+    console.log('New property:', formData);
+    setIsAddPropertyModalOpen(false);
+    // Optional: Show success toast/notification
   };
 
   const getPageTitle = () => {
@@ -50,9 +99,23 @@ export default function App() {
       case 'settings':
         return 'Configurações';
       case 'properties':
-        return 'Propriedades';
+        return currentModule === 'coleta' ? 'Propriedades & Matrizes' : 'Propriedades';
       case 'add-property':
         return 'Adicionar Propriedade';
+      case 'especies':
+        return 'Espécies';
+      case 'coletas':
+        return 'Coletas';
+      case 'monitoramentos':
+        return 'Monitoramentos';
+      case 'rotulos':
+        return 'Rótulos';
+      case 'equipe':
+        return 'Equipe';
+      case 'relatorios-coleta':
+        return 'Relatórios de Coleta';
+      case 'relatorio-preview':
+        return 'Visualização de Relatório';
       default:
         return 'Dashboard';
     }
@@ -61,7 +124,9 @@ export default function App() {
   const getPageSubtitle = () => {
     switch (currentPage) {
       case 'dashboard':
-        return 'Visão geral dos seus projetos de restauração ambiental';
+        return currentModule === 'restauracao' 
+          ? 'Visão geral dos seus projetos de restauração ambiental'
+          : 'Visão geral do Módulo de Coleta';
       case 'projects':
         return 'Gerencie seus projetos de restauração';
       case 'project-details':
@@ -77,9 +142,25 @@ export default function App() {
       case 'settings':
         return 'Configurações da plataforma';
       case 'properties':
-        return 'Gerencie suas propriedades';
+        return currentModule === 'coleta' 
+          ? 'Gestão unificada de propriedades e árvores matrizes'
+          : 'Gerencie suas propriedades';
       case 'add-property':
         return 'Adicione uma nova propriedade';
+      case 'especies':
+        return 'Gerencie as espécies';
+      case 'coletas':
+        return 'Gerencie as coletas';
+      case 'monitoramentos':
+        return 'Gerencie os monitoramentos';
+      case 'rotulos':
+        return 'Gerencie os rótulos';
+      case 'equipe':
+        return 'Gerencie a equipe';
+      case 'relatorios-coleta':
+        return 'Visualize e gere relatórios de coleta';
+      case 'relatorio-preview':
+        return 'Visualize o relatório de coleta';
       default:
         return '';
     }
@@ -138,6 +219,42 @@ export default function App() {
           { label: 'Propriedades', page: 'properties' },
           { label: 'Adicionar Propriedade', page: 'add-property' }
         ];
+      case 'especies':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Especies', page: 'especies' }
+        ];
+      case 'coletas':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Coletas', page: 'coletas' }
+        ];
+      case 'monitoramentos':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Monitoramentos', page: 'monitoramentos' }
+        ];
+      case 'rotulos':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Rótulos', page: 'rotulos' }
+        ];
+      case 'equipe':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Equipe', page: 'equipe' }
+        ];
+      case 'relatorios-coleta':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Relatórios de Coleta', page: 'relatorios-coleta' }
+        ];
+      case 'relatorio-preview':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Relatórios de Coleta', page: 'relatorios-coleta' },
+          { label: 'Visualização de Relatório', page: 'relatorio-preview' }
+        ];
       default:
         return [{ label: 'Início', page: 'dashboard' }];
     }
@@ -146,11 +263,13 @@ export default function App() {
   const renderPage = () => {
     switch (currentPage) {
       case 'dashboard':
-        return <Dashboard onPageChange={setCurrentPage} />;
+        return currentModule === 'restauracao' 
+          ? <Dashboard onPageChange={setCurrentPage} />
+          : <DashboardColeta />;
       case 'projects':
         return <Projects onPageChange={setCurrentPage} />;
       case 'project-details':
-        return <ProjectDetails />;
+        return <ProjectDetails onPageChange={setCurrentPage} />;
       case 'tasks':
         return <Tasks />;
       case 'contracts':
@@ -162,9 +281,27 @@ export default function App() {
       case 'settings':
         return <Settings />;
       case 'properties':
-        return <Properties onPageChange={setCurrentPage} />;
+        return currentModule === 'coleta'
+          ? <PropriedadesColeta />
+          : <Properties onPageChange={setCurrentPage} />;
       case 'add-property':
         return <AddProperty onPageChange={setCurrentPage} />;
+      case 'especies':
+        return currentModule === 'coleta'
+          ? <EspeciesColeta />
+          : <Especies />;
+      case 'coletas':
+        return <Coletas />;
+      case 'monitoramentos':
+        return <Monitoramentos />;
+      case 'rotulos':
+        return <Rotulos />;
+      case 'equipe':
+        return <Equipe />;
+      case 'relatorios-coleta':
+        return <RelatoriosColeta onGenerateReport={() => setCurrentPage('relatorio-preview')} />;
+      case 'relatorio-preview':
+        return <RelatorioPreview onBack={() => setCurrentPage('relatorios-coleta')} />;
       default:
         return <Dashboard onPageChange={setCurrentPage} />;
     }
@@ -222,6 +359,26 @@ export default function App() {
                   </Breadcrumb>
                 </div>
               </div>
+              
+              {/* Dicas de uso button - only show on Coleta dashboard */}
+              {currentPage === 'dashboard' && currentModule === 'coleta' && (
+                <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-[12px] px-4 py-2 flex items-center gap-2 transition-colors">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.33333} d="M8 1.33334V3.33334M8 12.6667V14.6667M3.28595 3.28596L4.69995 4.69996M11.3 11.3L12.714 12.714M1.33334 8H3.33334M12.6667 8H14.6667M3.28595 12.714L4.69995 11.3M11.3 4.69996L12.714 3.28596" />
+                  </svg>
+                  <span className="text-sm">Dicas de uso</span>
+                </button>
+              )}
+              
+              {/* Adicionar Propriedade button - only show on Coleta properties page */}
+              {currentPage === 'properties' && currentModule === 'coleta' && (
+                <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-[12px] px-4 py-2 flex items-center gap-2 transition-colors" onClick={handleAddPropertyClick}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.33333} d="M3.33333 8H12.6667M8 3.33333V12.6667" />
+                  </svg>
+                  <span className="text-sm">Adicionar Propriedade</span>
+                </button>
+              )}
             </div>
           </div>
           
@@ -230,6 +387,13 @@ export default function App() {
           </main>
         </div>
       </div>
+
+      {/* Add Property Modal */}
+      <AddPropertyModal
+        isOpen={isAddPropertyModalOpen}
+        onClose={() => setIsAddPropertyModalOpen(false)}
+        onSave={handleSaveProperty}
+      />
     </div>
   );
 }

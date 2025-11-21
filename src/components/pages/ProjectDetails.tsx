@@ -6,7 +6,11 @@ import { PropertyBank } from '../projects/PropertyBank';
 import { EditPropertyModal } from '../properties/EditPropertyModal';
 import { MapPin, Sprout, Package, Building2 } from 'lucide-react';
 
-export function ProjectDetails() {
+interface ProjectDetailsProps {
+  onPageChange?: (page: string) => void;
+}
+
+export function ProjectDetails({ onPageChange }: ProjectDetailsProps = {}) {
   const [isEditPropertyModalOpen, setIsEditPropertyModalOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   // Mock data for the project
@@ -276,6 +280,7 @@ export function ProjectDetails() {
             onRegisterPlanting={handleRegisterPlanting}
             onRegisterActivity={handleRegisterActivity}
             onAddProperty={handleAddProperty}
+            onPageChange={onPageChange}
           />
         </div>
       </div>

@@ -1,14 +1,21 @@
-import { useState } from 'react';
+import image_67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c from 'figma:asset/67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c.png';
+import image_be7effa508fab3d19d2bd09964eef0619bccc99c from 'figma:asset/be7effa508fab3d19d2bd09964eef0619bccc99c.png';
+import { ImageWithFallback } from '../figma/ImageWithFallback';
+import rastaFlorLogo from 'figma:asset/9c14cc3ff4bd6d87486f75d6184b5bc3e4d36350.png';
 import { 
-  Home, 
-  FolderTree, 
+  LayoutDashboard, 
+  FolderKanban, 
   CheckSquare, 
   FileText, 
   Settings,
-  Leaf,
   BarChart3,
   Receipt,
   MapPin,
+  TreePine,
+  Sprout,
+  ClipboardCheck,
+  Tag,
+  Users,
   RefreshCw
 } from 'lucide-react';
 
@@ -26,10 +33,10 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const navItems: NavItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: Home },
+const restauracaoNavItems: NavItem[] = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'properties', label: 'Propriedades', icon: MapPin },
-  { id: 'projects', label: 'Projetos', icon: FolderTree },
+  { id: 'projects', label: 'Projetos', icon: FolderKanban },
   { id: 'tasks', label: 'Tarefas', icon: CheckSquare },
   { id: 'contracts', label: 'Contratos', icon: FileText },
   { id: 'invoices', label: 'Notas Fiscais', icon: Receipt },
@@ -37,7 +44,20 @@ const navItems: NavItem[] = [
   { id: 'settings', label: 'Configurações', icon: Settings },
 ];
 
+const coletaNavItems: NavItem[] = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'properties', label: 'Propriedades', icon: MapPin },
+  { id: 'especies', label: 'Espécies', icon: Sprout },
+  { id: 'coletas', label: 'Coletas', icon: ClipboardCheck },
+  { id: 'monitoramentos', label: 'Monitoramentos', icon: TreePine },
+  { id: 'rotulos', label: 'Rótulos', icon: Tag },
+  { id: 'relatorios-coleta', label: 'Relatórios', icon: BarChart3 },
+  { id: 'equipe', label: 'Equipe', icon: Users },
+];
+
 export function Sidebar({ currentPage, onPageChange, isDarkMode, currentModule, onModuleChange }: SidebarProps) {
+  const navItems = currentModule === 'coleta' ? coletaNavItems : restauracaoNavItems;
+  
   return (
     <div className={`w-64 h-full flex flex-col shadow-sm border-r ${
       isDarkMode 
@@ -45,16 +65,13 @@ export function Sidebar({ currentPage, onPageChange, isDarkMode, currentModule, 
         : 'bg-white border-[#E0E0E0]'
     }`}>
       {/* Logo/Brand */}
-      <div className={`p-6 border-b ${
-        isDarkMode ? 'border-sidebar-border' : 'border-[#E0E0E0]'
-      }`}>
+      <div className={`h-16 px-6 flex items-center shrink-0 border-b ${isDarkMode ? 'border-sidebar-border' : 'border-[#E0E0E0]'}`} style={{ backgroundColor: '#0F3D26' }}>
         <div className="flex items-center gap-3">
-          <div>
-            <h2 className={`font-semibold ${isDarkMode ? 'text-sidebar-foreground' : 'text-[#1A1A1A]'}`}>RastaFlor</h2>
-            <p className={`text-xs ${isDarkMode ? 'text-sidebar-foreground/70' : 'text-[#777777]'}`}>
-              {currentModule === 'restauracao' ? 'Módulo de Restauração' : 'Módulo de Coleta'}
-            </p>
-          </div>
+          <img
+            src={image_67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c}
+            alt="RastaFlor Logo"
+            className="w-full h-auto object-contain"
+          />
         </div>
       </div>
 

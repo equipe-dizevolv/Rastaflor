@@ -1111,9 +1111,9 @@ export function EditPropertyModal({ isOpen, onClose, property, onSave }: EditPro
       >
         <div className="flex h-full">
           {/* Navigation Panel */}
-          <div className="w-64 bg-muted/50 border-r border-border p-6">
+          <div className="w-64 bg-[#0f3d26] border-r border-[#1a4d32] p-6">
             <DialogHeader className="mb-6">
-              <DialogTitle className="text-foreground">
+              <DialogTitle className="text-white">
                 {property ? 'Editar Propriedade' : 'Nova Propriedade'}
               </DialogTitle>
               <DialogDescription className="sr-only">
@@ -1130,8 +1130,8 @@ export function EditPropertyModal({ isOpen, onClose, property, onSave }: EditPro
                     onClick={() => setActiveTab(tab.key)}
                     className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
                       activeTab === tab.key
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-foreground hover:bg-muted'
+                        ? 'bg-[#0a2a1a] text-white'
+                        : 'text-white/80 hover:bg-[#1a4d32] hover:text-white'
                     }`}
                   >
                     <Icon className="w-5 h-5" />
