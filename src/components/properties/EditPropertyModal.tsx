@@ -142,10 +142,10 @@ export function EditPropertyModal({ isOpen, onClose, property, onSave }: EditPro
   useEffect(() => {
     if (property) {
       setFormData(property);
-      if (property.owners.length > 0) {
+      if (property.owners && property.owners.length > 0) {
         setSelectedOwnerId(property.owners[0].id);
       }
-      if (property.restorationAreas.length > 0) {
+      if (property.restorationAreas && property.restorationAreas.length > 0) {
         setSelectedAreaId(property.restorationAreas[0].id);
       }
     } else {
@@ -307,8 +307,8 @@ export function EditPropertyModal({ isOpen, onClose, property, onSave }: EditPro
     onClose();
   };
 
-  const selectedOwner = formData.owners.find(owner => owner.id === selectedOwnerId);
-  const selectedArea = formData.restorationAreas.find(area => area.id === selectedAreaId);
+  const selectedOwner = formData.owners?.find(owner => owner.id === selectedOwnerId);
+  const selectedArea = formData.restorationAreas?.find(area => area.id === selectedAreaId);
 
   const renderPropertyTab = () => (
     <div className="space-y-6">
@@ -403,7 +403,7 @@ export function EditPropertyModal({ isOpen, onClose, property, onSave }: EditPro
           <div className="space-y-2">
             <Label htmlFor="projects">Projetos</Label>
             <Select
-              value={formData.projects[0] || ''}
+              value={formData.projects?.[0] || ''}
               onValueChange={(value) => handlePropertyChange('projects', [value])}
             >
               <SelectTrigger className="bg-input border-border focus:border-primary">

@@ -1,6 +1,4 @@
-import image_67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c from 'figma:asset/67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c.png';
-import image_be7effa508fab3d19d2bd09964eef0619bccc99c from 'figma:asset/be7effa508fab3d19d2bd09964eef0619bccc99c.png';
-import { ImageWithFallback } from '../figma/ImageWithFallback';
+import image_98f13613464bb8a33ef6040f23a332d0526a80ef from 'figma:asset/98f13613464bb8a33ef6040f23a332d0526a80ef.png';
 import rastaFlorLogo from 'figma:asset/9c14cc3ff4bd6d87486f75d6184b5bc3e4d36350.png';
 import { 
   LayoutDashboard, 
@@ -16,7 +14,9 @@ import {
   ClipboardCheck,
   Tag,
   Users,
-  RefreshCw
+  RefreshCw,
+  Shield,
+  ChevronDown
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -24,7 +24,7 @@ interface SidebarProps {
   onPageChange: (page: string) => void;
   isDarkMode: boolean;
   currentModule?: 'restauracao' | 'coleta';
-  onModuleChange?: (module: 'restauracao' | 'coleta') => void;
+  onModuleChange?: (module: 'restauracao' | 'coleta' | 'admin') => void;
 }
 
 interface NavItem {
@@ -68,7 +68,7 @@ export function Sidebar({ currentPage, onPageChange, isDarkMode, currentModule, 
       <div className={`h-16 px-6 flex items-center shrink-0 border-b ${isDarkMode ? 'border-sidebar-border' : 'border-[#E0E0E0]'}`} style={{ backgroundColor: '#0F3D26' }}>
         <div className="flex items-center gap-3">
           <img
-            src={image_67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c}
+            src={image_98f13613464bb8a33ef6040f23a332d0526a80ef}
             alt="RastaFlor Logo"
             className="w-full h-auto object-contain"
           />
@@ -112,25 +112,69 @@ export function Sidebar({ currentPage, onPageChange, isDarkMode, currentModule, 
       {/* Module Switch */}
       {onModuleChange && (
         <div className={`px-4 pb-4 border-t ${isDarkMode ? 'border-sidebar-border' : 'border-[#E0E0E0]'}`}>
-          <button
-            onClick={() => onModuleChange(currentModule === 'restauracao' ? 'coleta' : 'restauracao')}
-            className={`
-              w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left mt-4
-              transition-all duration-200
-              ${isDarkMode
-                ? 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/30'
-                : 'text-[#777777] hover:text-[#1A1A1A] hover:bg-[#F5F5F5]'
-              }
-            `}
-          >
-            <RefreshCw className="w-5 h-5" />
-            <span className="text-sm">
-              {currentModule === 'restauracao' 
-                ? 'Alternar para Módulo de Coleta'
-                : 'Alternar para Módulo de Restauração'
-              }
-            </span>
-          </button>
+          <div className="mt-4 space-y-2">
+            <p className={`text-xs font-medium uppercase tracking-wider px-3 mb-2 ${
+              isDarkMode ? 'text-sidebar-foreground/50' : 'text-[#999999]'
+            }`}>
+              Alternar Módulo
+            </p>
+            
+            {/* Botão Restauração */}
+            <button
+              onClick={() => onModuleChange('restauracao')}
+              className={`
+                w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left
+                transition-all duration-200
+                ${currentModule === 'restauracao'
+                  ? isDarkMode
+                    ? 'bg-primary/20 text-primary border border-primary/30'
+                    : 'bg-primary/10 text-primary border border-primary/20'
+                  : isDarkMode
+                    ? 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/30'
+                    : 'text-[#777777] hover:text-[#1A1A1A] hover:bg-[#F5F5F5]'
+                }
+              `}
+            >
+              <TreePine className="w-5 h-5" />
+              <span className="text-sm">Módulo de Restauração</span>
+            </button>
+
+            {/* Botão Coleta */}
+            <button
+              onClick={() => onModuleChange('coleta')}
+              className={`
+                w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left
+                transition-all duration-200
+                ${currentModule === 'coleta'
+                  ? isDarkMode
+                    ? 'bg-primary/20 text-primary border border-primary/30'
+                    : 'bg-primary/10 text-primary border border-primary/20'
+                  : isDarkMode
+                    ? 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/30'
+                    : 'text-[#777777] hover:text-[#1A1A1A] hover:bg-[#F5F5F5]'
+                }
+              `}
+            >
+              <Sprout className="w-5 h-5" />
+              <span className="text-sm">Módulo de Coleta</span>
+            </button>
+
+            {/* Botão Admin */}
+            <button
+              onClick={() => onModuleChange('admin')}
+              className={`
+                w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left
+                transition-all duration-200
+                ${isDarkMode
+                  ? 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/30'
+                  : 'text-[#777777] hover:text-[#1A1A1A] hover:bg-[#F5F5F5]'
+                }
+              `}
+            >
+              <Shield className="w-5 h-5" />
+              <span className="text-sm">Painel Admin</span>
+            </button>
+          </div>
         </div>
       )}
 

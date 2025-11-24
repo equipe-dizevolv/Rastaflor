@@ -4,6 +4,8 @@ import { EnhancedKPICard } from '../projects/EnhancedKPICard';
 import { RestorationModels } from '../projects/RestorationModels';
 import { PropertyBank } from '../projects/PropertyBank';
 import { EditPropertyModal } from '../properties/EditPropertyModal';
+import { RegisterActivityModal, ActivityFormData } from '../modals/RegisterActivityModal';
+import { RegisterPlantingModal, PlantingFormData } from '../modals/RegisterPlantingModal';
 import { MapPin, Sprout, Package, Building2 } from 'lucide-react';
 
 interface ProjectDetailsProps {
@@ -13,6 +15,8 @@ interface ProjectDetailsProps {
 export function ProjectDetails({ onPageChange }: ProjectDetailsProps = {}) {
   const [isEditPropertyModalOpen, setIsEditPropertyModalOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
+  const [isRegisterActivityModalOpen, setIsRegisterActivityModalOpen] = useState(false);
+  const [isRegisterPlantingModalOpen, setIsRegisterPlantingModalOpen] = useState(false);
   // Mock data for the project
   const projectData = {
     name: 'Recuperação do Igarapé do Areal',
@@ -227,10 +231,12 @@ export function ProjectDetails({ onPageChange }: ProjectDetailsProps = {}) {
 
   const handleRegisterPlanting = (propertyId: string) => {
     console.log('Register planting for property:', propertyId);
+    setSelectedProperty(projectData.properties.find(p => p.id === propertyId));
+    setIsRegisterPlantingModalOpen(true);
   };
 
   const handleRegisterActivity = () => {
-    console.log('Register new activity');
+    setIsRegisterActivityModalOpen(true);
   };
 
   const handleAddProperty = () => {
@@ -241,6 +247,18 @@ export function ProjectDetails({ onPageChange }: ProjectDetailsProps = {}) {
   const handleSaveProperty = (propertyData: any) => {
     console.log('Save property:', propertyData);
     // Here you would normally save to your backend
+  };
+
+  const handleSaveActivity = (formData: ActivityFormData) => {
+    console.log('Save activity:', formData);
+    // Here you would normally save to your backend
+    setIsRegisterActivityModalOpen(false);
+  };
+
+  const handleSavePlanting = (formData: PlantingFormData) => {
+    console.log('Save planting:', formData);
+    // Here you would normally save to your backend
+    setIsRegisterPlantingModalOpen(false);
   };
 
   return (
@@ -291,6 +309,22 @@ export function ProjectDetails({ onPageChange }: ProjectDetailsProps = {}) {
         onClose={() => setIsEditPropertyModalOpen(false)}
         property={selectedProperty}
         onSave={handleSaveProperty}
+      />
+
+      {/* Register Activity Modal */}
+      <RegisterActivityModal
+        isOpen={isRegisterActivityModalOpen}
+        onClose={() => setIsRegisterActivityModalOpen(false)}
+        properties={projectData.properties}
+        onSave={handleSaveActivity}
+      />
+
+      {/* Register Planting Modal */}
+      <RegisterPlantingModal
+        isOpen={isRegisterPlantingModalOpen}
+        onClose={() => setIsRegisterPlantingModalOpen(false)}
+        property={selectedProperty}
+        onSave={handleSavePlanting}
       />
     </div>
   );

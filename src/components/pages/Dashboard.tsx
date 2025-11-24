@@ -170,12 +170,6 @@ export function Dashboard({ onPageChange }: DashboardProps) {
           <h2 className="text-xl text-foreground">
             Banco de Áreas
           </h2>
-          <Button 
-            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-[12px]"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Adicionar Nova Propriedade
-          </Button>
         </div>
 
         {/* Search Bar */}

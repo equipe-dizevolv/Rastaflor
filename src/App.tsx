@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
+import { AdminSidebar } from './components/admin/AdminSidebar';
+import { AdminHeader } from './components/admin/AdminHeader';
 import { Login } from './components/auth/Login';
+import { ModuleSelection } from './components/pages/ModuleSelection';
 import { Dashboard } from './components/pages/Dashboard';
 import { DashboardColeta } from './components/pages/DashboardColeta';
+import { AdminDashboard } from './components/pages/admin/AdminDashboard';
+import { AdminEmpresas } from './components/pages/admin/AdminEmpresas';
+import { AdminUsuarios } from './components/pages/admin/AdminUsuarios';
+import { AdminBugs } from './components/pages/admin/AdminBugs';
 import { Projects } from './components/pages/Projects';
 import { ProjectDetails } from './components/pages/ProjectDetails';
 import { Tasks } from './components/pages/Tasks';
@@ -23,6 +30,7 @@ import { Equipe } from './components/pages/Equipe';
 import { RelatoriosColeta } from './components/pages/RelatoriosColeta';
 import { RelatorioPreview } from './components/pages/RelatorioPreview';
 import { AddPropertyModal, PropertyFormData } from './components/modals/AddPropertyModal';
+import { InviteCompanyModal, CompanyFormData } from './components/modals/InviteCompanyModal';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -34,10 +42,12 @@ import {
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [moduleSelected, setModuleSelected] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [currentModule, setCurrentModule] = useState<'restauracao' | 'coleta'>('restauracao');
+  const [currentModule, setCurrentModule] = useState<'restauracao' | 'coleta' | 'admin'>('restauracao');
   const [isAddPropertyModalOpen, setIsAddPropertyModalOpen] = useState(false);
+  const [isInviteCompanyModalOpen, setIsInviteCompanyModalOpen] = useState(false);
 
   // Define o favicon e título da página
   useEffect(() => {
@@ -58,15 +68,38 @@ export default function App() {
     setIsAuthenticated(true);
   };
 
-  // Se não estiver autenticado, mostra a tela de login
-  if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
-  }
+  const handleModuleSelection = (module: 'restauracao' | 'coleta' | 'admin') => {
+    setCurrentModule(module);
+    setModuleSelected(true);
+    if (module === 'admin') {
+      setCurrentPage('admin-dashboard');
+    } else {
+      setCurrentPage('dashboard');
+    }
+  };
 
-  const handleModuleChange = (module: 'restauracao' | 'coleta') => {
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setModuleSelected(false);
+    setCurrentPage('dashboard');
+    setCurrentModule('restauracao');
+    setIsAddPropertyModalOpen(false);
+    setIsInviteCompanyModalOpen(false);
+  };
+
+  const handleBackToModules = () => {
+    setModuleSelected(false);
+    setCurrentPage('dashboard');
+  };
+
+  const handleModuleChange = (module: 'restauracao' | 'coleta' | 'admin') => {
     setCurrentModule(module);
     // Reset to dashboard when switching modules
-    setCurrentPage('dashboard');
+    if (module === 'admin') {
+      setCurrentPage('admin-dashboard');
+    } else {
+      setCurrentPage('dashboard');
+    }
   };
 
   const handleAddPropertyClick = () => {
@@ -77,6 +110,17 @@ export default function App() {
     // This would normally save to a database
     console.log('New property:', formData);
     setIsAddPropertyModalOpen(false);
+    // Optional: Show success toast/notification
+  };
+
+  const handleInviteCompanyClick = () => {
+    setIsInviteCompanyModalOpen(true);
+  };
+
+  const handleSaveCompany = (formData: CompanyFormData) => {
+    // This would normally save to a database
+    console.log('New company:', formData);
+    setIsInviteCompanyModalOpen(false);
     // Optional: Show success toast/notification
   };
 
@@ -261,6 +305,23 @@ export default function App() {
   };
 
   const renderPage = () => {
+    // Admin pages
+    if (currentModule === 'admin') {
+      switch (currentPage) {
+        case 'admin-dashboard':
+          return <AdminDashboard onInviteUser={handleInviteCompanyClick} />;
+        case 'admin-empresas':
+          return <AdminEmpresas onAddCompanyClick={handleInviteCompanyClick} />;
+        case 'admin-usuarios':
+          return <AdminUsuarios />;
+        case 'admin-bugs':
+          return <AdminBugs />;
+        default:
+          return <AdminDashboard onInviteUser={handleInviteCompanyClick} />;
+      }
+    }
+
+    // Regular module pages
     switch (currentPage) {
       case 'dashboard':
         return currentModule === 'restauracao' 
@@ -307,27 +368,58 @@ export default function App() {
     }
   };
 
+  // Login screen
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
+
+  // Module selection screen
+  if (!moduleSelected) {
+    return <ModuleSelection onSelectModule={handleModuleSelection} />;
+  }
+
   return (
     <div className={`h-screen flex ${isDarkMode ? 'dark bg-[#1A1A1A] text-white' : 'bg-[#F8F8F8] text-[#1A1A1A]'}`}>
       {/* Sidebar - Full Height */}
-      <Sidebar 
-        currentPage={currentPage} 
-        onPageChange={setCurrentPage} 
-        isDarkMode={isDarkMode}
-        currentModule={currentModule}
-        onModuleChange={handleModuleChange}
-      />
+      {currentModule === 'admin' ? (
+        <AdminSidebar 
+          currentPage={currentPage} 
+          onPageChange={setCurrentPage} 
+          isDarkMode={isDarkMode}
+          onBackToModules={handleBackToModules}
+          onLogout={handleLogout}
+        />
+      ) : (
+        <Sidebar 
+          currentPage={currentPage} 
+          onPageChange={setCurrentPage} 
+          isDarkMode={isDarkMode}
+          currentModule={currentModule === 'admin' ? 'restauracao' : currentModule}
+          onModuleChange={handleModuleChange}
+        />
+      )}
       
       {/* Main Content Area: Header + Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <Header isDarkMode={isDarkMode} onToggleTheme={() => setIsDarkMode(!isDarkMode)} />
+        {currentModule === 'admin' ? (
+          <AdminHeader 
+            isDarkMode={isDarkMode} 
+            onToggleTheme={() => setIsDarkMode(!isDarkMode)}
+          />
+        ) : (
+          <Header 
+            isDarkMode={isDarkMode} 
+            onToggleTheme={() => setIsDarkMode(!isDarkMode)}
+            onLogout={handleLogout}
+          />
+        )}
         
         {/* Content Area */}
         <div className="flex-1 flex flex-col min-h-0">
           {/* Page Header */}
           <div className="px-6 py-5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between pt-[0px] pr-[24px] pb-[0px] pl-[0px]">
               <div className="space-y-1">
                 <h1 className={isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}>{getPageTitle()}</h1>
                 <p className={isDarkMode ? 'text-[#B0B0B0]' : 'text-[#777777]'}>{getPageSubtitle()}</p>
@@ -379,6 +471,16 @@ export default function App() {
                   <span className="text-sm">Adicionar Propriedade</span>
                 </button>
               )}
+              
+              {/* Convidar Empresa button - only show on Admin Dashboard */}
+              {currentPage === 'admin-dashboard' && currentModule === 'admin' && (
+                <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-[12px] px-4 py-2 flex items-center gap-2 transition-colors" onClick={handleInviteCompanyClick}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.33333} d="M3.33333 8H12.6667M8 3.33333V12.6667" />
+                  </svg>
+                  <span className="text-sm">Convidar Empresa</span>
+                </button>
+              )}
             </div>
           </div>
           
@@ -393,6 +495,13 @@ export default function App() {
         isOpen={isAddPropertyModalOpen}
         onClose={() => setIsAddPropertyModalOpen(false)}
         onSave={handleSaveProperty}
+      />
+
+      {/* Invite Company Modal */}
+      <InviteCompanyModal
+        isOpen={isInviteCompanyModalOpen}
+        onClose={() => setIsInviteCompanyModalOpen(false)}
+        onSubmit={handleSaveCompany}
       />
     </div>
   );

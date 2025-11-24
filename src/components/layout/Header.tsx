@@ -1,4 +1,4 @@
-import { Bell, Sun, Moon, User } from 'lucide-react';
+import { Bell, Sun, Moon, User, LogOut } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useState } from 'react';
 import {
@@ -10,9 +10,10 @@ import {
 interface HeaderProps {
   isDarkMode: boolean;
   onToggleTheme: () => void;
+  onLogout?: () => void;
 }
 
-export function Header({ isDarkMode, onToggleTheme }: HeaderProps) {
+export function Header({ isDarkMode, onToggleTheme, onLogout }: HeaderProps) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   // Mock notifications data
@@ -157,6 +158,22 @@ export function Header({ isDarkMode, onToggleTheme }: HeaderProps) {
       >
         <User className="w-5 h-5" />
       </Button>
+      
+      {/* Logout Icon */}
+      {onLogout && (
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={onLogout}
+          className={`rounded-lg ${
+            isDarkMode 
+              ? 'text-card-foreground hover:bg-muted' 
+              : 'text-[#1A1A1A] hover:bg-[#F0F0F0]'
+          }`}
+        >
+          <LogOut className="w-5 h-5" />
+        </Button>
+      )}
     </header>
   );
 }
