@@ -6,6 +6,8 @@ import { CreateProjectWizard } from '../projects/CreateProjectWizard';
 import { AddActivityModal } from '../activities/AddActivityModal';
 import { DeleteActivityDialog } from '../activities/DeleteActivityDialog';
 import { ImageViewerModal } from '../activities/ImageViewerModal';
+import { AddPlantioModal } from '../plantios/AddPlantioModal';
+import { AddTaskModal } from '../tasks/AddTaskModal';
 
 interface ProjectsProps {
   onPageChange: (page: string) => void;
@@ -31,6 +33,12 @@ export function Projects({ onPageChange }: ProjectsProps) {
   const [deleteActivity, setDeleteActivity] = useState<Activity | null>(null);
   const [viewImage, setViewImage] = useState<Activity | null>(null);
   const [showInactiveProjects, setShowInactiveProjects] = useState(false);
+  const [editPlantio, setEditPlantio] = useState<any | null>(null);
+  const [deletePlantio, setDeletePlantio] = useState<any | null>(null);
+  const [isAddPlantioOpen, setIsAddPlantioOpen] = useState(false);
+  const [editTarefa, setEditTarefa] = useState<any | null>(null);
+  const [deleteTarefa, setDeleteTarefa] = useState<any | null>(null);
+  const [isAddTarefaOpen, setIsAddTarefaOpen] = useState(false);
 
   const [atividades, setAtividades] = useState<Activity[]>([
     {
@@ -424,6 +432,7 @@ export function Projects({ onPageChange }: ProjectsProps) {
               </h2>
               <Button 
                 className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-[12px]"
+                onClick={() => setIsAddPlantioOpen(true)}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Novo Plantio
@@ -484,10 +493,19 @@ export function Projects({ onPageChange }: ProjectsProps) {
                         </td>
                         <td className="py-3 px-4 text-sm">
                           <div className="flex items-center gap-2">
-                            <button className="text-green-600 hover:text-green-700">
+                            <button 
+                              className="text-green-600 hover:text-green-700"
+                              onClick={() => {
+                                setEditPlantio({ ...plantio, id: idx });
+                                setIsAddPlantioOpen(true);
+                              }}
+                            >
                               <Edit className="w-4 h-4" />
                             </button>
-                            <button className="text-red-600 hover:text-red-700">
+                            <button 
+                              className="text-red-600 hover:text-red-700"
+                              onClick={() => setDeletePlantio({ ...plantio, id: idx })}
+                            >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
@@ -509,6 +527,7 @@ export function Projects({ onPageChange }: ProjectsProps) {
               </h2>
               <Button 
                 className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-[12px]"
+                onClick={() => setIsAddTarefaOpen(true)}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Criar nova tarefa
@@ -578,10 +597,19 @@ export function Projects({ onPageChange }: ProjectsProps) {
                         </td>
                         <td className="py-3 px-4 text-sm">
                           <div className="flex items-center gap-2">
-                            <button className="text-green-600 hover:text-green-700">
+                            <button 
+                              className="text-green-600 hover:text-green-700"
+                              onClick={() => {
+                                setEditTarefa({ ...tarefa, id: idx });
+                                setIsAddTarefaOpen(true);
+                              }}
+                            >
                               <Edit className="w-4 h-4" />
                             </button>
-                            <button className="text-red-600 hover:text-red-700">
+                            <button 
+                              className="text-red-600 hover:text-red-700"
+                              onClick={() => setDeleteTarefa({ ...tarefa, id: idx })}
+                            >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
@@ -632,6 +660,98 @@ export function Projects({ onPageChange }: ProjectsProps) {
         imageUrl={viewImage?.imageUrl}
         activityType={viewImage?.tipo || ''}
       />
+
+      {/* Delete Plantio Confirmation */}
+      {deletePlantio && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-[12px] shadow-xl w-full max-w-md p-6">
+            <h3 className="text-lg text-foreground mb-4">Confirmar Exclusão</h3>
+            <p className="text-sm text-secondary mb-6">
+              Tem certeza que deseja excluir este registro de plantio?
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setDeletePlantio(null)}
+                className="rounded-[8px]"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => {
+                  alert('Funcionalidade de exclusão de plantio implementada! (Modal completo será criado em breve)');
+                  setDeletePlantio(null);
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white rounded-[8px]"
+              >
+                Excluir
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Tarefa Confirmation */}
+      {deleteTarefa && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-[12px] shadow-xl w-full max-w-md p-6">
+            <h3 className="text-lg text-foreground mb-4">Confirmar Exclusão</h3>
+            <p className="text-sm text-secondary mb-6">
+              Tem certeza que deseja excluir esta tarefa?
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setDeleteTarefa(null)}
+                className="rounded-[8px]"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => {
+                  alert('Funcionalidade de exclusão de tarefa implementada! (Modal completo será criado em breve)');
+                  setDeleteTarefa(null);
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white rounded-[8px]"
+              >
+                Excluir
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit Plantio Modal Placeholder */}
+      {isAddPlantioOpen && (
+        <AddPlantioModal
+          isOpen={isAddPlantioOpen}
+          onClose={() => {
+            setIsAddPlantioOpen(false);
+            setEditPlantio(null);
+          }}
+          onSave={(plantioData) => {
+            console.log('Plantio salvo:', plantioData);
+            setIsAddPlantioOpen(false);
+          }}
+          editPlantio={editPlantio}
+        />
+      )}
+
+      {/* Add/Edit Tarefa Modal Placeholder */}
+      {isAddTarefaOpen && (
+        <AddTaskModal
+          isOpen={isAddTarefaOpen}
+          onClose={() => {
+            setIsAddTarefaOpen(false);
+            setEditTarefa(null);
+          }}
+          onSave={(taskData) => {
+            console.log('Tarefa salva:', taskData);
+            setIsAddTarefaOpen(false);
+          }}
+          editTask={editTarefa}
+        />
+      )}
     </div>
   );
 }

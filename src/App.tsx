@@ -19,6 +19,7 @@ import { Invoices } from './components/pages/Invoices';
 import { Reports } from './components/pages/Reports';
 import { Settings } from './components/pages/Settings';
 import { Properties } from './components/pages/Properties';
+import { PropertyDetail } from './components/pages/PropertyDetail';
 import { PropriedadesColeta } from './components/pages/PropriedadesColeta';
 import { AddProperty } from './components/pages/AddProperty';
 import { Especies } from './components/pages/Especies';
@@ -44,6 +45,7 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [moduleSelected, setModuleSelected] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentModule, setCurrentModule] = useState<'restauracao' | 'coleta' | 'admin'>('restauracao');
   const [isAddPropertyModalOpen, setIsAddPropertyModalOpen] = useState(false);
@@ -144,6 +146,8 @@ export default function App() {
         return 'Configurações';
       case 'properties':
         return currentModule === 'coleta' ? 'Propriedades & Matrizes' : 'Propriedades';
+      case 'property-details':
+        return 'Detalhes da Propriedade';
       case 'add-property':
         return 'Adicionar Propriedade';
       case 'especies':
@@ -189,6 +193,8 @@ export default function App() {
         return currentModule === 'coleta' 
           ? 'Gestão unificada de propriedades e árvores matrizes'
           : 'Gerencie suas propriedades';
+      case 'property-details':
+        return 'Informações completas e atividades da propriedade';
       case 'add-property':
         return 'Adicione uma nova propriedade';
       case 'especies':
@@ -256,6 +262,12 @@ export default function App() {
         return [
           { label: 'Início', page: 'dashboard' },
           { label: 'Propriedades', page: 'properties' }
+        ];
+      case 'property-details':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Propriedades', page: 'properties' },
+          { label: 'Detalhes da Propriedade', page: 'property-details' }
         ];
       case 'add-property':
         return [
@@ -344,7 +356,15 @@ export default function App() {
       case 'properties':
         return currentModule === 'coleta'
           ? <PropriedadesColeta />
-          : <Properties onPageChange={setCurrentPage} />;
+          : <Properties onPageChange={(page: string, propertyId?: string) => {
+              setCurrentPage(page);
+              if (propertyId) setSelectedPropertyId(propertyId);
+            }} />;
+      case 'property-details':
+        return <PropertyDetail 
+          propertyId={selectedPropertyId || '1'} 
+          onBack={() => setCurrentPage('properties')} 
+        />;
       case 'add-property':
         return <AddProperty onPageChange={setCurrentPage} />;
       case 'especies':
@@ -421,11 +441,15 @@ export default function App() {
           <div className="px-6 py-5">
             <div className="flex items-center justify-between pt-[0px] pr-[24px] pb-[0px] pl-[0px]">
               <div className="space-y-1">
-                <h1 className={isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}>{getPageTitle()}</h1>
-                <p className={isDarkMode ? 'text-[#B0B0B0]' : 'text-[#777777]'}>{getPageSubtitle()}</p>
+                {currentPage !== 'property-details' && (
+                  <>
+                    <h1 className={isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}>{getPageTitle()}</h1>
+                    <p className={isDarkMode ? 'text-[#B0B0B0]' : 'text-[#777777]'}>{getPageSubtitle()}</p>
+                  </>
+                )}
                 
                 {/* Breadcrumb */}
-                <div className="pt-2">
+                <div className={currentPage !== 'property-details' ? 'pt-2' : ''}>
                   <Breadcrumb>
                     <BreadcrumbList>
                       {getBreadcrumbs().map((crumb, index) => (

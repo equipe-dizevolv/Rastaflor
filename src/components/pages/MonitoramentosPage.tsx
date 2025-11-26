@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Eye, Plus, Filter, Download, Pencil, Trash2 } from 'lucide-react';
 import { RegistrarMonitoramentoModal, MonitoringFormData } from '../modals/RegistrarMonitoramentoModal';
+import { EditMonitoramentoModal, MonitoringRecord as EditMonitoringRecord } from '../modals/EditMonitoramentoModal';
 
 interface MonitoringRecord {
   id: string;
@@ -15,6 +16,8 @@ interface MonitoringRecord {
 
 export function MonitoramentosPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingMonitoring, setEditingMonitoring] = useState<MonitoringRecord | null>(null);
   
   // Mock de monitoramentos registrados
   const [monitorings, setMonitorings] = useState<MonitoringRecord[]>([
@@ -95,8 +98,33 @@ export function MonitoramentosPage() {
   };
 
   const handleEdit = (id: string) => {
-    // TODO: Implementar edição
-    console.log('Editar:', id);
+    const monitoring = monitorings.find(m => m.id === id);
+    if (monitoring) {
+      setEditingMonitoring(monitoring);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingMonitoring(null);
+  };
+
+  const handleSaveEditedMonitoring = (formData: MonitoringFormData) => {
+    if (!editingMonitoring) return;
+
+    // Atualizar o monitoramento existente
+    const updatedMonitoring: MonitoringRecord = {
+      ...editingMonitoring,
+      dataMonitoramento: formData.dataMonitoramento?.toLocaleDateString('pt-BR') || editingMonitoring.dataMonitoramento,
+      responsavel: formData.responsavel,
+      estagios: formData.estagios,
+      observacoes: formData.observacoes,
+    };
+    
+    setMonitorings(monitorings.map(m => m.id === editingMonitoring.id ? updatedMonitoring : m));
+    setIsEditModalOpen(false);
+    setEditingMonitoring(null);
   };
 
   const handleDelete = (id: string) => {
@@ -296,6 +324,14 @@ export function MonitoramentosPage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSave={handleSaveMonitoring}
+      />
+      
+      {/* Edit Modal */}
+      <EditMonitoramentoModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        initialData={editingMonitoring}
+        onSave={handleSaveEditedMonitoring}
       />
     </div>
   );

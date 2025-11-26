@@ -43,9 +43,10 @@ interface Invoice {
 interface InvoiceTableProps {
   invoices: Invoice[];
   onDeleteInvoice: (invoiceId: string) => void;
+  onEditInvoice: (invoice: Invoice) => void;
 }
 
-export function InvoiceTable({ invoices, onDeleteInvoice }: InvoiceTableProps) {
+export function InvoiceTable({ invoices, onDeleteInvoice, onEditInvoice }: InvoiceTableProps) {
   const [deletingInvoiceId, setDeletingInvoiceId] = useState<string | null>(null);
 
   const handleViewInvoice = (invoice: Invoice) => {
@@ -55,9 +56,7 @@ export function InvoiceTable({ invoices, onDeleteInvoice }: InvoiceTableProps) {
   };
 
   const handleEditInvoice = (invoice: Invoice) => {
-    // Abrir modal de edição
-    console.log('Editing invoice:', invoice.id);
-    // Em um sistema real, isso abriria o modal de edição pré-preenchido
+    onEditInvoice(invoice);
   };
 
   const handleDownloadFile = (fileName: string) => {

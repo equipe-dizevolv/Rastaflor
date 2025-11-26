@@ -3,10 +3,13 @@ import { ContractTable } from '../contracts/ContractTable';
 import { Button } from '../ui/button';
 import { Plus } from 'lucide-react';
 import { CadastrarContratoModal, ContratoFormData } from '../modals/CadastrarContratoModal';
+import { EditContractModal } from '../modals/EditContractModal';
 
 export function Contracts() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFornecedorModalOpen, setIsFornecedorModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedContract, setSelectedContract] = useState<any>(null);
   
   const [contracts, setContracts] = useState([
     {
@@ -70,7 +73,19 @@ export function Contracts() {
   };
 
   const handleEditContract = (contractId: string) => {
-    console.log('Edit contract:', contractId);
+    const contract = contracts.find(c => c.id === contractId);
+    if (contract) {
+      setSelectedContract(contract);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  const handleUpdateContract = (updatedContract: any) => {
+    setContracts(contracts.map(c => 
+      c.id === updatedContract.id ? updatedContract : c
+    ));
+    setIsEditModalOpen(false);
+    setSelectedContract(null);
   };
 
   const handleDeleteContract = (contractId: string) => {
@@ -137,6 +152,17 @@ export function Contracts() {
           </div>
         </div>
       )}
+
+      {/* Edit Contract Modal */}
+      <EditContractModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedContract(null);
+        }}
+        onSave={handleUpdateContract}
+        contract={selectedContract}
+      />
     </div>
   );
 }

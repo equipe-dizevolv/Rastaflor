@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { KPICard } from '../dashboard/KPICard';
 import { TaskTable } from '../tasks/TaskTable';
 import { CreateTaskModal } from '../tasks/CreateTaskModal';
+import { EditTaskModal } from '../tasks/EditTaskModal';
 import { Button } from '../ui/button';
 import { Plus } from 'lucide-react';
 
 export function Tasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
   const [tasks, setTasks] = useState([
     {
       id: '1',
@@ -70,7 +73,22 @@ export function Tasks() {
   };
 
   const handleEditTask = (taskId: string) => {
-    console.log('Edit task:', taskId);
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      setSelectedTask(task);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  const handleUpdateTask = (updatedTask: any) => {
+    setTasks(prev => prev.map(task => 
+      task.id === updatedTask.id ? {
+        ...updatedTask,
+        dueDate: new Date(updatedTask.dueDate).toLocaleDateString('pt-BR')
+      } : task
+    ));
+    setIsEditModalOpen(false);
+    setSelectedTask(null);
   };
 
   const handleDeleteTask = (taskId: string) => {
@@ -122,6 +140,13 @@ export function Tasks() {
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         onSubmit={handleCreateTask}
+      />
+
+      <EditTaskModal
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        onSubmit={handleUpdateTask}
+        task={selectedTask}
       />
     </div>
   );

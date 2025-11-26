@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { InvoiceTable } from '../invoices/InvoiceTable';
 import { CreateInvoiceModal } from '../invoices/CreateInvoiceModal';
+import { EditInvoiceModal } from '../modals/EditInvoiceModal';
 import { 
   Plus, 
   Download,
@@ -24,6 +25,8 @@ interface Invoice {
 
 export function Invoices() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([
     {
       id: '1',
@@ -70,6 +73,19 @@ export function Invoices() {
 
   const handleDeleteInvoice = (invoiceId: string) => {
     setInvoices(prev => prev.filter(invoice => invoice.id !== invoiceId));
+  };
+
+  const handleEditInvoice = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateInvoice = (updatedInvoice: Invoice) => {
+    setInvoices(prev => prev.map(inv => 
+      inv.id === updatedInvoice.id ? updatedInvoice : inv
+    ));
+    setIsEditModalOpen(false);
+    setSelectedInvoice(null);
   };
 
   const totalInvoices = invoices.length;
@@ -160,6 +176,7 @@ export function Invoices() {
           <InvoiceTable 
             invoices={invoices} 
             onDeleteInvoice={handleDeleteInvoice}
+            onEditInvoice={handleEditInvoice}
           />
         </CardContent>
       </Card>
@@ -169,6 +186,17 @@ export function Invoices() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSave={handleCreateInvoice}
+      />
+
+      {/* Edit Invoice Modal */}
+      <EditInvoiceModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedInvoice(null);
+        }}
+        onSave={handleUpdateInvoice}
+        invoice={selectedInvoice}
       />
     </div>
   );

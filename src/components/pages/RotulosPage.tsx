@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Tag, Plus, Printer, Filter, Eye, Pencil, Copy, Trash2 } from 'lucide-react';
 import { GerarRotuloModal, LabelFormData } from '../modals/GerarRotuloModal';
+import { ViewRotuloModal } from '../modals/ViewRotuloModal';
+import { EditRotuloModal, SavedLabel as EditSavedLabel, LabelFormData as EditLabelFormData } from '../modals/EditRotuloModal';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Checkbox } from '../ui/checkbox';
@@ -28,6 +30,10 @@ interface RotulosPageProps {
 
 export function RotulosPage({ onGenerateLabels }: RotulosPageProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [viewingLabel, setViewingLabel] = useState<SavedLabel | null>(null);
+  const [editingLabel, setEditingLabel] = useState<SavedLabel | null>(null);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
   
   // Mock de rótulos cadastrados
@@ -135,13 +141,43 @@ export function RotulosPage({ onGenerateLabels }: RotulosPageProps) {
   };
 
   const handleViewLabel = (id: string) => {
-    // TODO: Implementar visualização detalhada
-    console.log('Visualizar rótulo:', id);
+    const label = savedLabels.find(label => label.id === id);
+    if (label) {
+      setViewingLabel(label);
+      setIsViewModalOpen(true);
+    }
   };
 
   const handleEditLabel = (id: string) => {
-    // TODO: Implementar edição
-    console.log('Editar rótulo:', id);
+    const label = savedLabels.find(label => label.id === id);
+    if (label) {
+      setEditingLabel(label);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  const handleSaveEditedLabel = (formData: EditLabelFormData) => {
+    if (!editingLabel) return;
+
+    const updatedLabel: SavedLabel = {
+      ...editingLabel,
+      lote: formData.lote || editingLabel.lote,
+      nomePopular: formData.nomePopular,
+      nomeCientifico: formData.nomeCientifico,
+      nomeComprador: formData.nomeComprador,
+      dataColeta: formData.dataColeta ? format(formData.dataColeta, 'dd/MM/yyyy', { locale: ptBR }) : editingLabel.dataColeta,
+      peso: formData.peso,
+      renasem: formData.renasem,
+      cnpj: formData.cnpj,
+      porcentagemGerminacao: formData.porcentagemGerminacao,
+      validadeTeste: formData.validadeTeste,
+      municipioColeta: formData.municipioColeta,
+      destino: formData.destino,
+    };
+
+    setSavedLabels(savedLabels.map(label => label.id === editingLabel.id ? updatedLabel : label));
+    setIsEditModalOpen(false);
+    setEditingLabel(null);
   };
 
   const handleDuplicateLabel = (id: string) => {
@@ -349,6 +385,17 @@ export function RotulosPage({ onGenerateLabels }: RotulosPageProps) {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onAddToList={handleAddLabel}
+      />
+      <ViewRotuloModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        labelData={viewingLabel}
+      />
+      <EditRotuloModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        initialData={editingLabel}
+        onSave={handleSaveEditedLabel}
       />
     </div>
   );

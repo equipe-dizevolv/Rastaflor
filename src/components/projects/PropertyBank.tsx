@@ -159,14 +159,21 @@ export function PropertyBank({
   };
 
   const handleEditProperty = (propertyId: string) => {
-    setSelectedPropertyId(propertyId);
-    setIsEditModalOpen(true);
+    const propertyData = getMockPropertyData(propertyId);
+    if (propertyData) {
+      setSelectedPropertyId(propertyId);
+      setIsEditModalOpen(true);
+    }
   };
 
   const handleSaveProperty = (propertyData: any) => {
     console.log('Saving property:', propertyData);
     // Here you would typically save to your backend
-    onEditProperty(propertyData.id);
+    setIsEditModalOpen(false);
+    setSelectedPropertyId(null);
+    if (onEditProperty) {
+      onEditProperty(propertyData.id);
+    }
   };
 
   return (
