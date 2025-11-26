@@ -1,5 +1,5 @@
 import svgPaths from "./svg-b7kzb62mdu";
-import rastaFlorLogo from 'figma:asset/9c14cc3ff4bd6d87486f75d6184b5bc3e4d36350.png';
+import rastaFlorLogo from 'figma:asset/98f13613464bb8a33ef6040f23a332d0526a80ef.jpg';
 
 function Login() {
   return (

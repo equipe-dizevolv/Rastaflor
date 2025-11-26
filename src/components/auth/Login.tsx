@@ -5,7 +5,7 @@ import { Label } from '../ui/label';
 import { Button } from '../ui/button';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
-import rastaFlorLogo from 'figma:asset/9c14cc3ff4bd6d87486f75d6184b5bc3e4d36350.png';
+import rastaFlorLogo from '../../assets/temp-logo.svg';
 
 interface LoginProps {
   onLogin: () => void;
@@ -26,15 +26,10 @@ export function Login({ onLogin }: LoginProps) {
     setError('');
     setIsLoading(true);
 
-    // Simula um delay de autenticação
+    // Libera o acesso sem validar credenciais nesta sessão local
     setTimeout(() => {
-      if (email === 'admin' && password === '1234') {
-        onLogin();
-      } else {
-        setError('Email ou senha incorretos. Tente novamente.');
-        setIsLoading(false);
-      }
-    }, 800);
+      onLogin();
+    }, 400);
   };
 
   const handleForgotPassword = (e: React.FormEvent) => {

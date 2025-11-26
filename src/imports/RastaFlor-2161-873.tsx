@@ -1,5 +1,5 @@
 import svgPaths from "./svg-sh8ubsjudq";
-import imgImageRastaFlorLogo from "figma:asset/67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c.png";
+import imgImageRastaFlorLogo from "figma:asset/67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c.jpg";
 
 function ImageRastaFlorLogo() {
   return (

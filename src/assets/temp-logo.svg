@@ -1,0 +1,20 @@
+<svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="leaf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f3d26"/>
+      <stop offset="100%" stop-color="#2fb464"/>
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="24" fill="#03150c"/>
+  <path d="M80 120c-20-10-32-28-32-46 0-21 15-34 32-34s32 13 32 34c0 18-12 36-32 46z" fill="url(#leaf)"/>
+  <circle cx="80" cy="52" r="10" fill="#f4f1d0"/>
+  <text x="80" y="142" font-family="Arial, sans-serif" font-size="24" fill="#f4f1d0" text-anchor="middle">RF</text>
+</svg>
+
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-import image_67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c from 'figma:asset/67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c.png';
+import image_67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c from 'figma:asset/67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c.jpg';
 import { 
   LayoutDashboard, 
   Building2,
