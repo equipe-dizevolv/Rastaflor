@@ -10,6 +10,7 @@ import { AdminSidebar } from './components/admin/AdminSidebar';
 import { AdminHeader } from './components/admin/AdminHeader';
 import { Login } from './components/auth/Login';
 import { ModuleSelection } from './components/pages/ModuleSelection';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Dashboard } from './components/pages/Dashboard';
 import { DashboardColeta } from './components/pages/DashboardColeta';
 import { AdminDashboard } from './components/pages/admin/AdminDashboard';
@@ -44,8 +45,8 @@ import {
   BreadcrumbSeparator,
 } from "./components/ui/breadcrumb";
 
-export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+function AppContent() {
+  const { user, signOut } = useAuth();
   const [moduleSelected, setModuleSelected] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
@@ -56,11 +57,13 @@ export default function App() {
   const [isUsageTipsModalOpen, setIsUsageTipsModalOpen] = useState(false);
   const [isReportBugModalOpen, setIsReportBugModalOpen] = useState(false);
 
+  const isAuthenticated = !!user;
+
   // Define o favicon e título da página
   useEffect(() => {
     // Atualiza o título da página
     document.title = 'RastaFlor - Gestão de Restauração Ambiental';
-    
+
     // Atualiza o favicon
     let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
     if (!link) {
@@ -72,7 +75,8 @@ export default function App() {
   }, []);
 
   const handleLogin = () => {
-    setIsAuthenticated(true);
+    // Authentication is now handled by AuthContext
+    // This function is still called after successful login
   };
 
   const handleModuleSelection = (module: 'restauracao' | 'coleta' | 'admin') => {
@@ -85,13 +89,17 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setModuleSelected(false);
-    setCurrentPage('dashboard');
-    setCurrentModule('restauracao');
-    setIsAddPropertyModalOpen(false);
-    setIsInviteCompanyModalOpen(false);
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      setModuleSelected(false);
+      setCurrentPage('dashboard');
+      setCurrentModule('restauracao');
+      setIsAddPropertyModalOpen(false);
+      setIsInviteCompanyModalOpen(false);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const handleBackToModules = () => {
@@ -572,5 +580,13 @@ export default function App() {
       {/* Toast Notifications */}
       <Toaster position="top-right" richColors closeButton />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }

@@ -1,73 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, Mail, Phone, UserCheck, UserX } from 'lucide-react';
+import { usersService } from '../../services/users.service';
+import { TeamMember as TeamMemberType, ROLE_LABELS } from '../../types/user.types';
+import { toast } from 'sonner';
 
 interface TeamMember {
-  id: number;
-  nome: string;
+  id: string;
+  name: string;
   email: string;
-  telefone: string;
-  funcao: string;
-  status: 'ativo' | 'inativo';
-  dataAdmissao: string;
+  phone?: string;
+  role: 'admin' | 'manager' | 'technician' | 'viewer';
+  is_active: boolean;
+  admission_date?: string;
 }
 
 export function Equipe() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [teamMembers, setTeamMembers] = useState<TeamMemberType[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const mockTeamMembers: TeamMember[] = [
-    {
-      id: 1,
-      nome: 'João Silva',
-      email: 'joao.silva@rastaflor.com',
-      telefone: '(11) 98765-4321',
-      funcao: 'Coordenador de Campo',
-      status: 'ativo',
-      dataAdmissao: '2023-01-15'
-    },
-    {
-      id: 2,
-      nome: 'Maria Santos',
-      email: 'maria.santos@rastaflor.com',
-      telefone: '(11) 98765-4322',
-      funcao: 'Técnica de Coleta',
-      status: 'ativo',
-      dataAdmissao: '2023-03-20'
-    },
-    {
-      id: 3,
-      nome: 'Pedro Oliveira',
-      email: 'pedro.oliveira@rastaflor.com',
-      telefone: '(11) 98765-4323',
-      funcao: 'Assistente de Campo',
-      status: 'ativo',
-      dataAdmissao: '2023-06-10'
-    },
-    {
-      id: 4,
-      nome: 'Ana Costa',
-      email: 'ana.costa@rastaflor.com',
-      telefone: '(11) 98765-4324',
-      funcao: 'Especialista em Identificação',
-      status: 'inativo',
-      dataAdmissao: '2022-11-05'
-    },
-    {
-      id: 5,
-      nome: 'Carlos Ferreira',
-      email: 'carlos.ferreira@rastaflor.com',
-      telefone: '(11) 98765-4325',
-      funcao: 'Técnico de Coleta',
-      status: 'ativo',
-      dataAdmissao: '2024-01-08'
+  // Load team members on mount
+  useEffect(() => {
+    loadTeamMembers();
+  }, []);
+
+  const loadTeamMembers = async () => {
+    try {
+      setLoading(true);
+      const members = await usersService.getTeamMembers();
+      setTeamMembers(members);
+    } catch (error: any) {
+      console.error('Error loading team members:', error);
+      toast.error(error.message || 'Erro ao carregar membros da equipe');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  const filteredMembers = mockTeamMembers.filter(member =>
-    member.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredMembers = teamMembers.filter(member =>
+    member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.funcao.toLowerCase().includes(searchTerm.toLowerCase())
+    ROLE_LABELS[member.role].toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleAddMember = () => {
@@ -75,21 +50,49 @@ export function Equipe() {
     setIsAddModalOpen(true);
   };
 
-  const handleEditMember = (member: TeamMember) => {
-    setSelectedMember(member);
+  const handleEditMember = (member: TeamMemberType) => {
+    setSelectedMember({
+      id: member.id,
+      name: member.name,
+      email: member.email,
+      phone: member.phone,
+      role: member.role,
+      is_active: member.is_active,
+      admission_date: member.admission_date,
+    });
     setIsAddModalOpen(true);
   };
 
-  const handleDeleteMember = (id: number) => {
-    if (confirm('Tem certeza que deseja remover este membro da equipe?')) {
-      console.log('Deletar membro:', id);
-      // Aqui você implementaria a lógica de delete
+  const handleDeleteMember = async (id: string) => {
+    if (!confirm('Tem certeza que deseja remover este membro da equipe?')) {
+      return;
+    }
+
+    try {
+      await usersService.deleteTeamMember(id);
+      toast.success('Membro removido com sucesso');
+      loadTeamMembers();
+    } catch (error: any) {
+      console.error('Error deleting member:', error);
+      toast.error(error.message || 'Erro ao remover membro');
     }
   };
 
-  const handleToggleStatus = (member: TeamMember) => {
-    console.log('Alternar status:', member.id);
-    // Aqui você implementaria a lógica de ativar/desativar
+  const handleToggleStatus = async (member: TeamMemberType) => {
+    try {
+      await usersService.toggleUserStatus(member.id, !member.is_active);
+      toast.success(`Membro ${!member.is_active ? 'ativado' : 'desativado'} com sucesso`);
+      loadTeamMembers();
+    } catch (error: any) {
+      console.error('Error toggling status:', error);
+      toast.error(error.message || 'Erro ao alterar status');
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsAddModalOpen(false);
+    setSelectedMember(null);
+    loadTeamMembers();
   };
 
   return (
@@ -126,102 +129,111 @@ export function Equipe() {
       </div>
 
       {/* Team Members Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {filteredMembers.map((member) => (
-          <div
-            key={member.id}
-            className="bg-white dark:bg-card border border-[#E0E0E0] dark:border-border rounded-[12px] p-6 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-[#1A1A1A] dark:text-white">{member.nome}</h3>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs ${
-                      member.status === 'ativo'
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-                    }`}
-                  >
-                    {member.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                  </span>
-                </div>
-                <p className="text-[#777777] dark:text-[#B0B0B0] text-sm mb-3">
-                  {member.funcao}
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => handleEditMember(member)}
-                  title="Editar"
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded-lg transition-colors"
-                >
-                  <Edit2 className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
-                </button>
-                <button
-                  onClick={() => handleToggleStatus(member)}
-                  title={member.status === 'ativo' ? 'Desativar' : 'Ativar'}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded-lg transition-colors"
-                >
-                  {member.status === 'ativo' ? (
-                    <UserX className="w-4 h-4 text-orange-600" />
-                  ) : (
-                    <UserCheck className="w-4 h-4 text-green-600" />
-                  )}
-                </button>
-                <button
-                  onClick={() => handleDeleteMember(member.id)}
-                  title="Remover"
-                  className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4 text-red-600" />
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <Mail className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
-                <a
-                  href={`mailto:${member.email}`}
-                  className="text-[#777777] dark:text-[#B0B0B0] hover:text-primary transition-colors"
-                >
-                  {member.email}
-                </a>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Phone className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
-                <a
-                  href={`tel:${member.telefone}`}
-                  className="text-[#777777] dark:text-[#B0B0B0] hover:text-primary transition-colors"
-                >
-                  {member.telefone}
-                </a>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-[#777777] dark:text-[#B0B0B0] pt-2 border-t border-[#E0E0E0] dark:border-[#3A3A3A]">
-                Admissão: {new Date(member.dataAdmissao).toLocaleDateString('pt-BR')}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredMembers.length === 0 && (
+      {loading ? (
         <div className="bg-white dark:bg-card border border-[#E0E0E0] dark:border-border rounded-[12px] p-12 text-center">
-          <p className="text-[#777777] dark:text-[#B0B0B0]">
-            Nenhum membro encontrado
-          </p>
+          <p className="text-[#777777] dark:text-[#B0B0B0]">Carregando...</p>
         </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {filteredMembers.map((member) => (
+              <div
+                key={member.id}
+                className="bg-white dark:bg-card border border-[#E0E0E0] dark:border-border rounded-[12px] p-6 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-[#1A1A1A] dark:text-white">{member.name}</h3>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs ${
+                          member.is_active
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        {member.is_active ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </div>
+                    <p className="text-[#777777] dark:text-[#B0B0B0] text-sm mb-3">
+                      {ROLE_LABELS[member.role]}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleEditMember(member)}
+                      title="Editar"
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded-lg transition-colors"
+                    >
+                      <Edit2 className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
+                    </button>
+                    <button
+                      onClick={() => handleToggleStatus(member)}
+                      title={member.is_active ? 'Desativar' : 'Ativar'}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded-lg transition-colors"
+                    >
+                      {member.is_active ? (
+                        <UserX className="w-4 h-4 text-orange-600" />
+                      ) : (
+                        <UserCheck className="w-4 h-4 text-green-600" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteMember(member.id)}
+                      title="Remover"
+                      className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Mail className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
+                    <a
+                      href={`mailto:${member.email}`}
+                      className="text-[#777777] dark:text-[#B0B0B0] hover:text-primary transition-colors"
+                    >
+                      {member.email}
+                    </a>
+                  </div>
+                  {member.phone && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Phone className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
+                      <a
+                        href={`tel:${member.phone}`}
+                        className="text-[#777777] dark:text-[#B0B0B0] hover:text-primary transition-colors"
+                      >
+                        {member.phone}
+                      </a>
+                    </div>
+                  )}
+                  {member.admission_date && (
+                    <div className="flex items-center gap-2 text-sm text-[#777777] dark:text-[#B0B0B0] pt-2 border-t border-[#E0E0E0] dark:border-[#3A3A3A]">
+                      Admissão: {new Date(member.admission_date).toLocaleDateString('pt-BR')}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {filteredMembers.length === 0 && !loading && (
+            <div className="bg-white dark:bg-card border border-[#E0E0E0] dark:border-border rounded-[12px] p-12 text-center">
+              <p className="text-[#777777] dark:text-[#B0B0B0]">
+                Nenhum membro encontrado
+              </p>
+            </div>
+          )}
+        </>
       )}
 
       {/* Add/Edit Member Modal */}
       {isAddModalOpen && (
         <AddMemberModal
           isOpen={isAddModalOpen}
-          onClose={() => {
-            setIsAddModalOpen(false);
-            setSelectedMember(null);
-          }}
+          onClose={handleModalClose}
           member={selectedMember}
         />
       )}
@@ -239,21 +251,41 @@ interface AddMemberModalProps {
 function AddMemberModal({ isOpen, onClose, member }: AddMemberModalProps) {
   const isDarkMode = document.documentElement.classList.contains('dark');
   const [formData, setFormData] = useState({
-    nome: member?.nome || '',
+    name: member?.name || '',
     email: member?.email || '',
-    telefone: member?.telefone || '',
-    funcao: member?.funcao || '',
-    status: member?.status || 'ativo',
-    dataAdmissao: member?.dataAdmissao || new Date().toISOString().split('T')[0]
+    phone: member?.phone || '',
+    role: member?.role || 'viewer' as 'admin' | 'manager' | 'technician' | 'viewer',
+    is_active: member?.is_active ?? true,
+    admission_date: member?.admission_date || new Date().toISOString().split('T')[0]
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Salvar membro:', formData);
-    // Aqui você implementaria a lógica de salvar
-    onClose();
+    setError('');
+    setIsLoading(true);
+
+    try {
+      if (member?.id) {
+        // Update existing member
+        await usersService.updateTeamMember(member.id, formData);
+        toast.success('Membro atualizado com sucesso');
+      } else {
+        // Create new member
+        await usersService.createTeamMember(formData);
+        toast.success('Membro adicionado com sucesso');
+      }
+      onClose();
+    } catch (err: any) {
+      console.error('Error saving member:', err);
+      setError(err.message || 'Erro ao salvar membro');
+      toast.error(err.message || 'Erro ao salvar membro');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -278,6 +310,12 @@ function AddMemberModal({ isOpen, onClose, member }: AddMemberModalProps) {
 
         {/* Form Content */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+              <p className="text-red-800 dark:text-red-200 text-sm">{error}</p>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
               <label className={`block text-sm mb-2 ${
@@ -287,13 +325,14 @@ function AddMemberModal({ isOpen, onClose, member }: AddMemberModalProps) {
               </label>
               <input
                 type="text"
-                value={formData.nome}
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className={`w-full rounded-[8px] px-3 py-2 border ${
-                  isDarkMode 
-                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white' 
+                  isDarkMode
+                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white'
                     : 'bg-white border-[#E0E0E0]'
                 }`}
+                disabled={isLoading}
                 required
               />
             </div>
@@ -309,10 +348,11 @@ function AddMemberModal({ isOpen, onClose, member }: AddMemberModalProps) {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className={`w-full rounded-[8px] px-3 py-2 border ${
-                  isDarkMode 
-                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white' 
+                  isDarkMode
+                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white'
                     : 'bg-white border-[#E0E0E0]'
                 }`}
+                disabled={isLoading}
                 required
               />
             </div>
@@ -321,18 +361,18 @@ function AddMemberModal({ isOpen, onClose, member }: AddMemberModalProps) {
               <label className={`block text-sm mb-2 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
               }`}>
-                Telefone *
+                Telefone
               </label>
               <input
                 type="tel"
-                value={formData.telefone}
-                onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className={`w-full rounded-[8px] px-3 py-2 border ${
-                  isDarkMode 
-                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white' 
+                  isDarkMode
+                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white'
                     : 'bg-white border-[#E0E0E0]'
                 }`}
-                required
+                disabled={isLoading}
               />
             </div>
 
@@ -343,21 +383,21 @@ function AddMemberModal({ isOpen, onClose, member }: AddMemberModalProps) {
                 Função *
               </label>
               <select
-                value={formData.funcao}
-                onChange={(e) => setFormData({ ...formData, funcao: e.target.value })}
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
                 className={`w-full rounded-[8px] px-3 py-2 border ${
-                  isDarkMode 
-                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white' 
+                  isDarkMode
+                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white'
                     : 'bg-white border-[#E0E0E0]'
                 }`}
+                disabled={isLoading}
                 required
               >
                 <option value="">Selecione...</option>
-                <option value="Coordenador de Campo">Coordenador de Campo</option>
-                <option value="Técnica de Coleta">Técnico(a) de Coleta</option>
-                <option value="Assistente de Campo">Assistente de Campo</option>
-                <option value="Especialista em Identificação">Especialista em Identificação</option>
-                <option value="Motorista">Motorista</option>
+                <option value="admin">Administrador</option>
+                <option value="manager">Gerente</option>
+                <option value="technician">Técnico</option>
+                <option value="viewer">Visualizador</option>
               </select>
             </div>
 
@@ -368,18 +408,38 @@ function AddMemberModal({ isOpen, onClose, member }: AddMemberModalProps) {
                 Status *
               </label>
               <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as 'ativo' | 'inativo' })}
+                value={formData.is_active ? 'active' : 'inactive'}
+                onChange={(e) => setFormData({ ...formData, is_active: e.target.value === 'active' })}
                 className={`w-full rounded-[8px] px-3 py-2 border ${
-                  isDarkMode 
-                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white' 
+                  isDarkMode
+                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white'
                     : 'bg-white border-[#E0E0E0]'
                 }`}
+                disabled={isLoading}
                 required
               >
-                <option value="ativo">Ativo</option>
-                <option value="inativo">Inativo</option>
+                <option value="active">Ativo</option>
+                <option value="inactive">Inativo</option>
               </select>
+            </div>
+
+            <div>
+              <label className={`block text-sm mb-2 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                Data de Admissão
+              </label>
+              <input
+                type="date"
+                value={formData.admission_date}
+                onChange={(e) => setFormData({ ...formData, admission_date: e.target.value })}
+                className={`w-full rounded-[8px] px-3 py-2 border ${
+                  isDarkMode
+                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white'
+                    : 'bg-white border-[#E0E0E0]'
+                }`}
+                disabled={isLoading}
+              />
             </div>
           </div>
 
@@ -390,19 +450,28 @@ function AddMemberModal({ isOpen, onClose, member }: AddMemberModalProps) {
             <button
               type="button"
               onClick={onClose}
+              disabled={isLoading}
               className={`px-4 py-2 rounded-[8px] transition-colors ${
-                isDarkMode 
-                  ? 'border border-[#3A3A3A] text-gray-300 hover:bg-[#1A1A1A]' 
+                isDarkMode
+                  ? 'border border-[#3A3A3A] text-gray-300 hover:bg-[#1A1A1A]'
                   : 'border border-[#E0E0E0] hover:bg-gray-100'
-              }`}
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-[#0F3D26] text-white hover:bg-[#0F3D26]/90 rounded-[8px] transition-colors"
+              disabled={isLoading}
+              className="px-4 py-2 bg-[#0F3D26] text-white hover:bg-[#0F3D26]/90 rounded-[8px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {member ? 'Salvar Alterações' : 'Adicionar Membro'}
+              {isLoading && (
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              )}
+              {isLoading
+                ? 'Salvando...'
+                : member
+                ? 'Salvar Alterações'
+                : 'Adicionar Membro'}
             </button>
           </div>
         </form>
