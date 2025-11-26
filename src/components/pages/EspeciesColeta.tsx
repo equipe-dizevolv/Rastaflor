@@ -90,6 +90,16 @@ export function EspeciesColeta() {
     }
   };
 
+  const handleViewSpecies = (id: string) => {
+    console.log('Visualizar espécie ID:', id);
+    // TODO: Abrir modal de visualização
+  };
+
+  const handleEditSpecies = (id: string) => {
+    console.log('Editar espécie ID:', id);
+    // TODO: Abrir modal de edição
+  };
+
   const filteredSpecies = species.filter(s =>
     s.popularName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.scientificName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -200,12 +210,14 @@ export function EspeciesColeta() {
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-center gap-2">
                           <button
+                            onClick={() => handleViewSpecies(specie.id)}
                             title="Visualizar"
                             className="p-1.5 hover:bg-[#E0E0E0] dark:hover:bg-[#2A2A2A] rounded-[8px] transition-colors"
                           >
                             <Eye className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
                           </button>
                           <button
+                            onClick={() => handleEditSpecies(specie.id)}
                             title="Editar"
                             className="p-1.5 hover:bg-[#E0E0E0] dark:hover:bg-[#2A2A2A] rounded-[8px] transition-colors"
                           >

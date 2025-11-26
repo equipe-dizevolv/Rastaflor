@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus, Search, Edit } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { EditPropertyModal } from '../properties/EditPropertyModal';
 
 interface DashboardProps {
   onPageChange: (page: string) => void;
@@ -9,6 +10,8 @@ interface DashboardProps {
 
 export function Dashboard({ onPageChange }: DashboardProps) {
   const isDarkMode = document.documentElement.classList.contains('dark');
+  const [isEditPropertyModalOpen, setIsEditPropertyModalOpen] = useState(false);
+  const [selectedProperty, setSelectedProperty] = useState<any>(null);
 
   const kpiData = [
     { title: 'Hectares Plantados (Total)', value: '87', unit: 'Ha' },
@@ -199,7 +202,13 @@ export function Dashboard({ onPageChange }: DashboardProps) {
                     <p>📍 {property.location}</p>
                   </div>
                 </div>
-                <button className="text-sm text-foreground hover:underline flex items-center gap-2">
+                <button 
+                  className="text-sm text-foreground hover:underline flex items-center gap-2"
+                  onClick={() => {
+                    setSelectedProperty(property);
+                    setIsEditPropertyModalOpen(true);
+                  }}
+                >
                   <Edit className="w-4 h-4" />
                   Editar propriedade
                 </button>
@@ -255,6 +264,13 @@ export function Dashboard({ onPageChange }: DashboardProps) {
           ))}
         </div>
       </div>
+
+      {/* Edit Property Modal */}
+      <EditPropertyModal
+        isOpen={isEditPropertyModalOpen}
+        onClose={() => setIsEditPropertyModalOpen(false)}
+        property={selectedProperty}
+      />
     </div>
   );
 }

@@ -18,6 +18,13 @@ export function MonitoramentosPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingMonitoring, setEditingMonitoring] = useState<MonitoringRecord | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    propriedade: '',
+    responsavel: '',
+    dataInicio: '',
+    dataFim: ''
+  });
   
   // Mock de monitoramentos registrados
   const [monitorings, setMonitorings] = useState<MonitoringRecord[]>([
@@ -157,6 +164,11 @@ export function MonitoramentosPage() {
     return labels[estagioId] || estagioId;
   };
 
+  const handleExport = () => {
+    // Implementar a lógica de exportação aqui
+    alert('Exportação de lista não implementada');
+  };
+
   return (
     <div className="px-6 pb-6 space-y-6">
       {/* Page Header */}
@@ -172,11 +184,17 @@ export function MonitoramentosPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="px-4 py-2 bg-primary text-primary-foreground rounded-[8px] hover:bg-primary/90 transition-colors flex items-center gap-2 text-sm">
+          <button 
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-[8px] hover:bg-primary/90 transition-colors flex items-center gap-2 text-sm"
+          >
             <Filter className="w-4 h-4" />
             <span>Filtros</span>
           </button>
-          <button className="px-4 py-2 bg-white dark:bg-card border border-[#0f3d26] text-[#0f3d26] dark:text-white rounded-[8px] hover:bg-[#F8F8F8] dark:hover:bg-[#2A2A2A] transition-colors flex items-center gap-2 text-sm">
+          <button 
+            onClick={handleExport}
+            className="px-4 py-2 bg-white dark:bg-card border border-[#0f3d26] text-[#0f3d26] dark:text-white rounded-[8px] hover:bg-[#F8F8F8] dark:hover:bg-[#2A2A2A] transition-colors flex items-center gap-2 text-sm"
+          >
             <Download className="w-4 h-4" />
             <span>Exportar Lista</span>
           </button>

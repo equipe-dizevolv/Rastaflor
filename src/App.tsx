@@ -1,4 +1,9 @@
+import { AddPropertyModal, PropertyFormData } from './components/modals/AddPropertyModal';
+import { InviteCompanyModal, CompanyFormData } from './components/modals/InviteCompanyModal';
+import { UsageTipsModal } from './components/modals/UsageTipsModal';
+import { ReportBugModal } from './components/modals/ReportBugModal';
 import { useState, useEffect } from 'react';
+import { Toaster } from 'sonner@2.0.3';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { AdminSidebar } from './components/admin/AdminSidebar';
@@ -30,8 +35,6 @@ import { Rotulos } from './components/pages/Rotulos';
 import { Equipe } from './components/pages/Equipe';
 import { RelatoriosColeta } from './components/pages/RelatoriosColeta';
 import { RelatorioPreview } from './components/pages/RelatorioPreview';
-import { AddPropertyModal, PropertyFormData } from './components/modals/AddPropertyModal';
-import { InviteCompanyModal, CompanyFormData } from './components/modals/InviteCompanyModal';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -50,6 +53,8 @@ export default function App() {
   const [currentModule, setCurrentModule] = useState<'restauracao' | 'coleta' | 'admin'>('restauracao');
   const [isAddPropertyModalOpen, setIsAddPropertyModalOpen] = useState(false);
   const [isInviteCompanyModalOpen, setIsInviteCompanyModalOpen] = useState(false);
+  const [isUsageTipsModalOpen, setIsUsageTipsModalOpen] = useState(false);
+  const [isReportBugModalOpen, setIsReportBugModalOpen] = useState(false);
 
   // Define o favicon e título da página
   useEffect(() => {
@@ -478,7 +483,17 @@ export default function App() {
               
               {/* Dicas de uso button - only show on Coleta dashboard */}
               {currentPage === 'dashboard' && currentModule === 'coleta' && (
-                <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-[12px] px-4 py-2 flex items-center gap-2 transition-colors">
+                <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-[12px] px-4 py-2 flex items-center gap-2 transition-colors" onClick={() => setIsUsageTipsModalOpen(true)}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.33333} d="M8 1.33334V3.33334M8 12.6667V14.6667M3.28595 3.28596L4.69995 4.69996M11.3 11.3L12.714 12.714M1.33334 8H3.33334M12.6667 8H14.6667M3.28595 12.714L4.69995 11.3M11.3 4.69996L12.714 3.28596" />
+                  </svg>
+                  <span className="text-sm">Dicas de uso</span>
+                </button>
+              )}
+              
+              {/* Dicas de uso button - only show on Restauração dashboard */}
+              {currentPage === 'dashboard' && currentModule === 'restauracao' && (
+                <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-[12px] px-4 py-2 flex items-center gap-2 transition-colors" onClick={() => setIsUsageTipsModalOpen(true)}>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.33333} d="M8 1.33334V3.33334M8 12.6667V14.6667M3.28595 3.28596L4.69995 4.69996M11.3 11.3L12.714 12.714M1.33334 8H3.33334M12.6667 8H14.6667M3.28595 12.714L4.69995 11.3M11.3 4.69996L12.714 3.28596" />
                   </svg>
@@ -527,6 +542,35 @@ export default function App() {
         onClose={() => setIsInviteCompanyModalOpen(false)}
         onSubmit={handleSaveCompany}
       />
+
+      {/* Usage Tips Modal */}
+      <UsageTipsModal
+        isOpen={isUsageTipsModalOpen}
+        onClose={() => setIsUsageTipsModalOpen(false)}
+        module={currentModule}
+      />
+
+      {/* Report Bug Modal */}
+      <ReportBugModal
+        isOpen={isReportBugModalOpen}
+        onClose={() => setIsReportBugModalOpen(false)}
+      />
+
+      {/* Floating Bug Report Button - Available on all pages except admin pages */}
+      {currentModule !== 'admin' && (
+        <button
+          onClick={() => setIsReportBugModalOpen(true)}
+          className="fixed bottom-6 right-6 w-14 h-14 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 z-40"
+          title="Reportar Bug"
+        >
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </button>
+      )}
+
+      {/* Toast Notifications */}
+      <Toaster position="top-right" richColors closeButton />
     </div>
   );
 }

@@ -125,6 +125,36 @@ export function PropertyDetailsColeta({ property, onBack }: PropertyDetailsColet
     setIsAddMatrixModalOpen(false);
   };
 
+  const handleViewArea = (id: string) => {
+    console.log('Ver detalhes da área ID:', id);
+    // TODO: Abrir modal de visualização de área
+  };
+
+  const handleEditArea = (id: string) => {
+    console.log('Editar área ID:', id);
+    // TODO: Abrir modal de edição de área
+  };
+
+  const handleDeleteArea = (id: string) => {
+    console.log('Excluir área ID:', id);
+    // TODO: Abrir confirmação de exclusão
+  };
+
+  const handleViewMatrix = (id: string) => {
+    console.log('Ver detalhes da matriz ID:', id);
+    // TODO: Abrir modal de visualização de matriz
+  };
+
+  const handleEditMatrix = (id: string) => {
+    console.log('Editar matriz ID:', id);
+    // TODO: Abrir modal de edição de matriz
+  };
+
+  const handleDeleteMatrix = (id: string) => {
+    console.log('Excluir matriz ID:', id);
+    // TODO: Abrir confirmação de exclusão
+  };
+
   return (
     <div className="px-6 pb-6 space-y-6">
       {/* Back Button */}
@@ -387,18 +417,21 @@ export function PropertyDetailsColeta({ property, onBack }: PropertyDetailsColet
                           <button
                             className="p-2 rounded-[8px] hover:bg-[#F0F0F0] dark:hover:bg-[#2A2A2A] transition-colors"
                             title="Ver detalhes"
+                            onClick={() => handleViewArea(area.id)}
                           >
                             <Eye className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
                           </button>
                           <button
                             className="p-2 rounded-[8px] hover:bg-[#F0F0F0] dark:hover:bg-[#2A2A2A] transition-colors"
                             title="Editar"
+                            onClick={() => handleEditArea(area.id)}
                           >
                             <Edit className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
                           </button>
                           <button
                             className="p-2 rounded-[8px] hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                             title="Excluir"
+                            onClick={() => handleDeleteArea(area.id)}
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </button>
@@ -499,18 +532,21 @@ export function PropertyDetailsColeta({ property, onBack }: PropertyDetailsColet
                           <button
                             className="p-2 rounded-[8px] hover:bg-[#F0F0F0] dark:hover:bg-[#2A2A2A] transition-colors"
                             title="Ver detalhes"
+                            onClick={() => handleViewMatrix(matrix.id)}
                           >
                             <Eye className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
                           </button>
                           <button
                             className="p-2 rounded-[8px] hover:bg-[#F0F0F0] dark:hover:bg-[#2A2A2A] transition-colors"
                             title="Editar"
+                            onClick={() => handleEditMatrix(matrix.id)}
                           >
                             <Edit className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
                           </button>
                           <button
                             className="p-2 rounded-[8px] hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                             title="Excluir"
+                            onClick={() => handleDeleteMatrix(matrix.id)}
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </button>

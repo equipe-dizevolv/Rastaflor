@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, Edit, Ban, Trash2, Plus } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
+import { toast } from 'sonner';
 
 // Mock data
 const mockEmpresas = [
@@ -59,6 +60,31 @@ export function AdminEmpresas({ onAddCompanyClick }: { onAddCompanyClick?: () =>
     empresa.razaoSocial.toLowerCase().includes(searchTerm.toLowerCase()) ||
     empresa.cnpj.includes(searchTerm)
   );
+
+  const handleEditEmpresa = (id: number) => {
+    const empresa = mockEmpresas.find(e => e.id === id);
+    toast.info(`Abrindo edição: ${empresa?.razaoSocial}`, {
+      description: 'Modal de edição será implementado'
+    });
+    console.log('Editar empresa ID:', id);
+  };
+
+  const handleToggleStatus = (id: number, currentStatus: string) => {
+    const empresa = mockEmpresas.find(e => e.id === id);
+    const novoStatus = currentStatus === 'Ativo' ? 'Inativo' : 'Ativo';
+    toast.success(`Status alterado: ${empresa?.razaoSocial}`, {
+      description: `Status mudou de ${currentStatus} para ${novoStatus}`
+    });
+    console.log('Alternar status da empresa ID:', id, 'Status atual:', currentStatus);
+  };
+
+  const handleDeleteEmpresa = (id: number) => {
+    const empresa = mockEmpresas.find(e => e.id === id);
+    toast.error(`Solicitação de exclusão: ${empresa?.razaoSocial}`, {
+      description: 'Modal de confirmação será implementado'
+    });
+    console.log('Excluir empresa ID:', id);
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -159,6 +185,7 @@ export function AdminEmpresas({ onAddCompanyClick }: { onAddCompanyClick?: () =>
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-[#777777] hover:text-[#1A1A1A]"
+                        onClick={() => handleEditEmpresa(empresa.id)}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -166,6 +193,7 @@ export function AdminEmpresas({ onAddCompanyClick }: { onAddCompanyClick?: () =>
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-[#777777] hover:text-orange-600"
+                        onClick={() => handleToggleStatus(empresa.id, empresa.status)}
                       >
                         <Ban className="h-4 w-4" />
                       </Button>
@@ -173,6 +201,7 @@ export function AdminEmpresas({ onAddCompanyClick }: { onAddCompanyClick?: () =>
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-[#777777] hover:text-red-600"
+                        onClick={() => handleDeleteEmpresa(empresa.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

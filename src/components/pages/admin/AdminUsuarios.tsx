@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, Edit, KeyRound, Trash2, X } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
+import { toast } from 'sonner';
 import {
   Select,
   SelectContent,
@@ -98,6 +99,37 @@ export function AdminUsuarios() {
     setSortBy('nome');
   };
 
+  const handleEditUsuario = (id: number) => {
+    const usuario = mockUsuarios.find(u => u.id === id);
+    toast.info(`Abrindo edição: ${usuario?.nome}`, {
+      description: 'Modal de edição será implementado'
+    });
+    console.log('Editar usuário ID:', id);
+  };
+
+  const handleResetPassword = (id: number) => {
+    const usuario = mockUsuarios.find(u => u.id === id);
+    toast.success(`Email de reset enviado para ${usuario?.nome}`, {
+      description: `Um link de redefinição foi enviado para ${usuario?.email}`
+    });
+    console.log('Resetar senha do usuário ID:', id);
+  };
+
+  const handleDeleteUsuario = (id: number) => {
+    const usuario = mockUsuarios.find(u => u.id === id);
+    toast.error(`Solicitação de exclusão: ${usuario?.nome}`, {
+      description: 'Modal de confirmação será implementado'
+    });
+    console.log('Excluir usuário ID:', id);
+  };
+
+  const handleCreateUser = () => {
+    toast.info('Criar novo usuário', {
+      description: 'Modal de criação será implementado'
+    });
+    console.log('Criar novo usuário');
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -106,7 +138,7 @@ export function AdminUsuarios() {
           <h2 className="text-2xl font-semibold text-[#1A1A1A]">Usuários</h2>
           <p className="text-[#777777] mt-1">Gerencie todos os usuários da plataforma</p>
         </div>
-        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-[12px]">
+        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-[12px]" onClick={handleCreateUser}>
           Criar usuário
         </Button>
       </div>
@@ -248,6 +280,7 @@ export function AdminUsuarios() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-[#777777] hover:text-[#1A1A1A]"
+                        onClick={() => handleEditUsuario(usuario.id)}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -255,6 +288,7 @@ export function AdminUsuarios() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-[#777777] hover:text-blue-600"
+                        onClick={() => handleResetPassword(usuario.id)}
                       >
                         <KeyRound className="h-4 w-4" />
                       </Button>
@@ -262,6 +296,7 @@ export function AdminUsuarios() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-[#777777] hover:text-red-600"
+                        onClick={() => handleDeleteUsuario(usuario.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

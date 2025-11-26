@@ -1,5 +1,6 @@
 import { Eye, CheckCircle } from 'lucide-react';
 import { Button } from '../../ui/button';
+import { toast } from 'sonner';
 
 // Mock data
 const mockBugs = [
@@ -60,6 +61,22 @@ const mockBugs = [
 ];
 
 export function AdminBugs() {
+  const handleViewBug = (id: number) => {
+    const bug = mockBugs.find(b => b.id === id);
+    toast.info(`Visualizando bug: ${bug?.pagina}`, {
+      description: bug?.descricao
+    });
+    console.log('Ver detalhes do bug ID:', id);
+  };
+
+  const handleMarkAsResolved = (id: number) => {
+    const bug = mockBugs.find(b => b.id === id);
+    toast.success(`Bug resolvido: ${bug?.pagina}`, {
+      description: 'O status foi atualizado para "Solucionado"'
+    });
+    console.log('Marcar bug como resolvido ID:', id);
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -132,6 +149,7 @@ export function AdminBugs() {
                         size="icon"
                         className="h-8 w-8 text-[#777777] hover:text-[#1A1A1A]"
                         title="Ver Detalhes"
+                        onClick={() => handleViewBug(bug.id)}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -141,6 +159,7 @@ export function AdminBugs() {
                           size="icon"
                           className="h-8 w-8 text-[#777777] hover:text-green-600"
                           title="Marcar como Resolvido"
+                          onClick={() => handleMarkAsResolved(bug.id)}
                         >
                           <CheckCircle className="h-4 w-4" />
                         </Button>

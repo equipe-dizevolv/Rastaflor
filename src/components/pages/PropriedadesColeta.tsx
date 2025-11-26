@@ -147,6 +147,16 @@ export function PropriedadesColeta({ onViewDetails }: PropriedadesColetaProps) {
     }
   };
 
+  const handleDeleteProperty = (id: string, name: string) => {
+    if (confirm(`Tem certeza que deseja excluir a propriedade "${name}"?`)) {
+      const index = mockProperties.findIndex((p) => p.id === id);
+      if (index !== -1) {
+        mockProperties.splice(index, 1);
+      }
+      console.log('Propriedade excluída ID:', id);
+    }
+  };
+
   if (selectedProperty) {
     return <PropertyDetailsColeta property={selectedProperty} onBack={handleBackToList} />;
   }
@@ -251,6 +261,7 @@ export function PropriedadesColeta({ onViewDetails }: PropriedadesColetaProps) {
                         <button
                           className="p-2 rounded-[8px] hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                           title="Excluir"
+                          onClick={() => handleDeleteProperty(property.id, property.name)}
                         >
                           <Trash2 className="w-4 h-4 text-red-600" />
                         </button>
