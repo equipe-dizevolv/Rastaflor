@@ -5,6 +5,8 @@ import { EditPropertyModal } from '../modals/EditPropertyModal';
 import { RegisterActivityModal } from '../modals/RegisterActivityModal';
 import { RegisterPlantingModal } from '../modals/RegisterPlantingModal';
 import { AddAreaModal, AreaFormData } from '../modals/AddAreaModal';
+import { ContractTable } from '../contracts/ContractTable';
+import { InvoiceTable } from '../invoices/InvoiceTable';
 
 interface PropertyDetailProps {
   propertyId: string;
@@ -108,6 +110,7 @@ export function PropertyDetail({ propertyId, onBack }: PropertyDetailProps) {
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   const [isPlantingModalOpen, setIsPlantingModalOpen] = useState(false);
   const [isAddAreaModalOpen, setIsAddAreaModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'contracts' | 'invoices'>('overview');
 
   const property = mockProperties[propertyId as keyof typeof mockProperties] || mockProperties['1'];
 
@@ -337,43 +340,106 @@ export function PropertyDetail({ propertyId, onBack }: PropertyDetailProps) {
         </div>
       </div>
 
-      {/* Recent Activities */}
-      <div className={`p-6 rounded-[12px] ${
-        isDarkMode ? 'bg-[#2A2A2A]' : 'bg-white border border-[#E0E0E0]'
-      }`}>
-        <h3 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`}>
-          Atividades Recentes
-        </h3>
-
-        <div className="space-y-3">
-          {property.activities.map((activity) => (
-            <div
-              key={activity.id}
-              className={`p-4 rounded-lg border ${
-                isDarkMode ? 'border-[#3A3A3A] bg-[#1A1A1A]' : 'border-[#E0E0E0] bg-gray-50'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${
-                    activity.type === 'Plantio' ? 'bg-green-500' :
-                    activity.type === 'Manutenção' ? 'bg-blue-500' :
-                    'bg-purple-500'
-                  }`} />
-                  <div>
-                    <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`}>
-                      {activity.type}
-                    </p>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {activity.date} • {activity.area} • {activity.responsible}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+      {/* Tabs Navigation */}
+      <div className={`border-b ${isDarkMode ? 'border-[#3A3A3A]' : 'border-[#E0E0E0]'}`}>
+        <div className="flex gap-8">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`pb-3 border-b-2 transition-colors ${
+              activeTab === 'overview'
+                ? 'border-primary text-primary'
+                : isDarkMode
+                  ? 'border-transparent text-gray-400 hover:text-white'
+                  : 'border-transparent text-gray-600 hover:text-[#1A1A1A]'
+            }`}
+          >
+            Visão Geral
+          </button>
+          <button
+            onClick={() => setActiveTab('contracts')}
+            className={`pb-3 border-b-2 transition-colors ${
+              activeTab === 'contracts'
+                ? 'border-primary text-primary'
+                : isDarkMode
+                  ? 'border-transparent text-gray-400 hover:text-white'
+                  : 'border-transparent text-gray-600 hover:text-[#1A1A1A]'
+            }`}
+          >
+            Contratos
+          </button>
+          <button
+            onClick={() => setActiveTab('invoices')}
+            className={`pb-3 border-b-2 transition-colors ${
+              activeTab === 'invoices'
+                ? 'border-primary text-primary'
+                : isDarkMode
+                  ? 'border-transparent text-gray-400 hover:text-white'
+                  : 'border-transparent text-gray-600 hover:text-[#1A1A1A]'
+            }`}
+          >
+            Notas Fiscais
+          </button>
         </div>
       </div>
+
+      {/* Tab Content */}
+      {activeTab === 'overview' && (
+        <div className="space-y-6">
+          {/* Recent Activities */}
+          <div className={`p-6 rounded-[12px] ${
+            isDarkMode ? 'bg-[#2A2A2A]' : 'bg-white border border-[#E0E0E0]'
+          }`}>
+            <h3 className={`font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`}>
+              Atividades Recentes
+            </h3>
+
+            <div className="space-y-3">
+              {property.activities.map((activity) => (
+                <div
+                  key={activity.id}
+                  className={`p-4 rounded-lg border ${
+                    isDarkMode ? 'border-[#3A3A3A] bg-[#1A1A1A]' : 'border-[#E0E0E0] bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${
+                        activity.type === 'Plantio' ? 'bg-green-500' :
+                        activity.type === 'Manutenção' ? 'bg-blue-500' :
+                        'bg-purple-500'
+                      }`} />
+                      <div>
+                        <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`}>
+                          {activity.type}
+                        </p>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {activity.date} • {activity.area} • {activity.responsible}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'contracts' && (
+        <div className={`p-6 rounded-[12px] ${
+          isDarkMode ? 'bg-[#2A2A2A]' : 'bg-white border border-[#E0E0E0]'
+        }`}>
+          <ContractTable propertyId={property.id} />
+        </div>
+      )}
+
+      {activeTab === 'invoices' && (
+        <div className={`p-6 rounded-[12px] ${
+          isDarkMode ? 'bg-[#2A2A2A]' : 'bg-white border border-[#E0E0E0]'
+        }`}>
+          <InvoiceTable propertyId={property.id} />
+        </div>
+      )}
 
       {/* Modals */}
       <EditPropertyModal

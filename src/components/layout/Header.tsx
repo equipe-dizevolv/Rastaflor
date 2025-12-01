@@ -1,4 +1,4 @@
-import { Bell, Sun, Moon, User, LogOut } from 'lucide-react';
+import { Bell, Sun, Moon, User, LogOut, Settings, UserCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useState } from 'react';
 import {
@@ -11,10 +11,12 @@ interface HeaderProps {
   isDarkMode: boolean;
   onToggleTheme: () => void;
   onLogout?: () => void;
+  onPageChange?: (page: string) => void;
 }
 
-export function Header({ isDarkMode, onToggleTheme, onLogout }: HeaderProps) {
+export function Header({ isDarkMode, onToggleTheme, onLogout, onPageChange }: HeaderProps) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   // Mock notifications data
   const notifications = [
@@ -122,8 +124,10 @@ export function Header({ isDarkMode, onToggleTheme, onLogout }: HeaderProps) {
                   : 'text-primary hover:bg-[#F0F0F0]'
               }`}
               onClick={() => {
-                console.log('Ver todas as notificações');
                 setNotificationsOpen(false);
+                if (onPageChange) {
+                  onPageChange('notifications');
+                }
               }}
             >
               Ver todas as notificações
@@ -147,33 +151,106 @@ export function Header({ isDarkMode, onToggleTheme, onLogout }: HeaderProps) {
       </Button>
       
       {/* User Profile Icon */}
-      <Button 
-        variant="ghost" 
-        size="icon"
-        className={`rounded-lg ${
-          isDarkMode 
-            ? 'text-card-foreground hover:bg-muted' 
-            : 'text-[#1A1A1A] hover:bg-[#F0F0F0]'
-        }`}
-      >
-        <User className="w-5 h-5" />
-      </Button>
-      
-      {/* Logout Icon */}
-      {onLogout && (
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={onLogout}
-          className={`rounded-lg ${
-            isDarkMode 
-              ? 'text-card-foreground hover:bg-muted' 
-              : 'text-[#1A1A1A] hover:bg-[#F0F0F0]'
-          }`}
+      <Popover open={profileOpen} onOpenChange={setProfileOpen}>
+        <PopoverTrigger asChild>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className={`rounded-lg ${
+              isDarkMode 
+                ? 'text-card-foreground hover:bg-muted' 
+                : 'text-[#1A1A1A] hover:bg-[#F0F0F0]'
+            }`}
+          >
+            <User className="w-5 h-5" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent 
+          className={`w-64 p-0 ${isDarkMode ? 'bg-card border-border' : 'bg-white'}`} 
+          align="end"
+          sideOffset={8}
         >
-          <LogOut className="w-5 h-5" />
-        </Button>
-      )}
+          {/* User Info Header */}
+          <div className={`p-4 border-b ${isDarkMode ? 'border-border' : 'border-[#E0E0E0]'}`}>
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                isDarkMode ? 'bg-muted' : 'bg-[#F0F0F0]'
+              }`}>
+                <User className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`font-medium text-sm truncate ${
+                  isDarkMode ? 'text-card-foreground' : 'text-[#1A1A1A]'
+                }`}>
+                  Administrador
+                </p>
+                <p className={`text-xs truncate ${
+                  isDarkMode ? 'text-muted-foreground' : 'text-[#777777]'
+                }`}>
+                  admin@rastaflor.com
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Menu Options */}
+          <div className="py-2">
+            <button
+              className={`w-full px-4 py-2.5 text-left transition-colors flex items-center gap-3 ${
+                isDarkMode 
+                  ? 'hover:bg-muted/50 text-card-foreground' 
+                  : 'hover:bg-[#F8F8F8] text-[#1A1A1A]'
+              }`}
+              onClick={() => {
+                setProfileOpen(false);
+                if (onPageChange) {
+                  onPageChange('settings');
+                }
+              }}
+            >
+              <UserCircle className="w-4 h-4" />
+              <span className="text-sm">Meu Perfil</span>
+            </button>
+
+            <button
+              className={`w-full px-4 py-2.5 text-left transition-colors flex items-center gap-3 ${
+                isDarkMode 
+                  ? 'hover:bg-muted/50 text-card-foreground' 
+                  : 'hover:bg-[#F8F8F8] text-[#1A1A1A]'
+              }`}
+              onClick={() => {
+                setProfileOpen(false);
+                if (onPageChange) {
+                  onPageChange('settings');
+                }
+              }}
+            >
+              <Settings className="w-4 h-4" />
+              <span className="text-sm">Configurações</span>
+            </button>
+          </div>
+
+          {/* Logout Button */}
+          {onLogout && (
+            <div className={`p-3 border-t ${isDarkMode ? 'border-border' : 'border-[#E0E0E0]'}`}>
+              <button 
+                className={`w-full text-sm text-center py-2 rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                  isDarkMode 
+                    ? 'text-red-400 hover:bg-red-500/10' 
+                    : 'text-red-600 hover:bg-red-50'
+                }`}
+                onClick={() => {
+                  setProfileOpen(false);
+                  onLogout();
+                }}
+              >
+                <LogOut className="w-4 h-4" />
+                Sair da Conta
+              </button>
+            </div>
+          )}
+        </PopoverContent>
+      </Popover>
     </header>
   );
 }

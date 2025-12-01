@@ -11,12 +11,36 @@ interface Contract {
 
 interface ContractTableProps {
   contracts: Contract[];
-  onDownload: (contractId: string) => void;
-  onEdit: (contractId: string) => void;
-  onDelete: (contractId: string) => void;
+  onDownload?: (contractId: string) => void;
+  onEdit?: (contractId: string) => void;
+  onDelete?: (contractId: string) => void;
 }
 
 export function ContractTable({ contracts, onDownload, onEdit, onDelete }: ContractTableProps) {
+  const handleDownload = (id: string) => {
+    if (onDownload) {
+      onDownload(id);
+    } else {
+      console.log('Download contract:', id);
+    }
+  };
+
+  const handleEdit = (id: string) => {
+    if (onEdit) {
+      onEdit(id);
+    } else {
+      console.log('Edit contract:', id);
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    if (onDelete) {
+      onDelete(id);
+    } else if (confirm('Tem certeza que deseja excluir este contrato?')) {
+      console.log('Delete contract:', id);
+    }
+  };
+
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
@@ -45,7 +69,7 @@ export function ContractTable({ contracts, onDownload, onEdit, onDelete }: Contr
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onDownload(contract.id)}
+                      onClick={() => handleDownload(contract.id)}
                       className="h-8 w-8 p-0 text-secondary hover:text-primary hover:bg-muted"
                     >
                       <Download className="w-4 h-4" />
@@ -53,7 +77,7 @@ export function ContractTable({ contracts, onDownload, onEdit, onDelete }: Contr
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onEdit(contract.id)}
+                      onClick={() => handleEdit(contract.id)}
                       className="h-8 w-8 p-0 text-secondary hover:text-primary hover:bg-muted"
                     >
                       <Edit className="w-4 h-4" />
@@ -61,7 +85,7 @@ export function ContractTable({ contracts, onDownload, onEdit, onDelete }: Contr
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onDelete(contract.id)}
+                      onClick={() => handleDelete(contract.id)}
                       className="h-8 w-8 p-0 text-secondary hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="w-4 h-4" />

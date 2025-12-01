@@ -21,7 +21,6 @@ import {
   AlertDialogTrigger,
 } from '../ui/alert-dialog';
 import { 
-  Eye, 
   Edit, 
   Trash2, 
   Download,
@@ -42,21 +41,31 @@ interface Invoice {
 
 interface InvoiceTableProps {
   invoices: Invoice[];
-  onDeleteInvoice: (invoiceId: string) => void;
-  onEditInvoice: (invoice: Invoice) => void;
+  onDeleteInvoice?: (invoiceId: string) => void;
+  onEditInvoice?: (invoice: Invoice) => void;
+  onEdit?: (invoiceId: string) => void;
 }
 
-export function InvoiceTable({ invoices, onDeleteInvoice, onEditInvoice }: InvoiceTableProps) {
+export function InvoiceTable({ invoices, onDeleteInvoice, onEditInvoice, onEdit }: InvoiceTableProps) {
   const [deletingInvoiceId, setDeletingInvoiceId] = useState<string | null>(null);
 
-  const handleViewInvoice = (invoice: Invoice) => {
-    // Simular abertura do arquivo
-    console.log('Viewing invoice:', invoice.fileName);
-    // Em um sistema real, isso abriria o arquivo em uma nova aba ou modal
+  const handleDelete = (invoiceId: string) => {
+    if (onDeleteInvoice) {
+      onDeleteInvoice(invoiceId);
+    } else {
+      console.log('Delete invoice:', invoiceId);
+    }
+    setDeletingInvoiceId(null);
   };
 
-  const handleEditInvoice = (invoice: Invoice) => {
-    onEditInvoice(invoice);
+  const handleEdit = (invoice: Invoice) => {
+    if (onEditInvoice) {
+      onEditInvoice(invoice);
+    } else if (onEdit) {
+      onEdit(invoice.id);
+    } else {
+      console.log('Edit invoice:', invoice);
+    }
   };
 
   const handleDownloadFile = (fileName: string) => {
@@ -67,8 +76,7 @@ export function InvoiceTable({ invoices, onDeleteInvoice, onEditInvoice }: Invoi
 
   const handleDeleteConfirm = () => {
     if (deletingInvoiceId) {
-      onDeleteInvoice(deletingInvoiceId);
-      setDeletingInvoiceId(null);
+      handleDelete(deletingInvoiceId);
     }
   };
 
@@ -149,16 +157,7 @@ export function InvoiceTable({ invoices, onDeleteInvoice, onEditInvoice }: Invoi
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleViewInvoice(invoice)}
-                    className="h-8 w-8 p-0 hover:bg-muted"
-                    title="Visualizar"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleEditInvoice(invoice)}
+                    onClick={() => handleEdit(invoice)}
                     className="h-8 w-8 p-0 hover:bg-muted"
                     title="Editar"
                   >

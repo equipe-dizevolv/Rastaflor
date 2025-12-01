@@ -1,5 +1,4 @@
 import image_98f13613464bb8a33ef6040f23a332d0526a80ef from 'figma:asset/98f13613464bb8a33ef6040f23a332d0526a80ef.png';
-import rastaFlorLogo from 'figma:asset/9c14cc3ff4bd6d87486f75d6184b5bc3e4d36350.png';
 import { 
   LayoutDashboard, 
   FolderKanban, 
@@ -16,7 +15,10 @@ import {
   Users,
   RefreshCw,
   Shield,
-  ChevronDown
+  ChevronDown,
+  Search,
+  DollarSign,
+  Package
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -38,9 +40,10 @@ const restauracaoNavItems: NavItem[] = [
   { id: 'properties', label: 'Propriedades', icon: MapPin },
   { id: 'projects', label: 'Projetos', icon: FolderKanban },
   { id: 'tasks', label: 'Tarefas', icon: CheckSquare },
-  { id: 'contracts', label: 'Contratos', icon: FileText },
-  { id: 'invoices', label: 'Notas Fiscais', icon: Receipt },
+  { id: 'financiamento', label: 'Financiadores', icon: DollarSign },
+  { id: 'fornecedores', label: 'Fornecedores', icon: Package },
   { id: 'reports', label: 'Relatórios', icon: BarChart3 },
+  { id: 'equipe-restauracao', label: 'Equipe', icon: Users },
   { id: 'settings', label: 'Configurações', icon: Settings },
 ];
 
@@ -48,8 +51,9 @@ const coletaNavItems: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'properties', label: 'Propriedades', icon: MapPin },
   { id: 'especies', label: 'Espécies', icon: Sprout },
+  { id: 'arvores-matrizes', label: 'Árvores Matrizes', icon: TreePine },
   { id: 'coletas', label: 'Coletas', icon: ClipboardCheck },
-  { id: 'monitoramentos', label: 'Monitoramentos', icon: TreePine },
+  { id: 'monitoramentos', label: 'Monitoramentos', icon: Search },
   { id: 'rotulos', label: 'Rótulos', icon: Tag },
   { id: 'relatorios-coleta', label: 'Relatórios', icon: BarChart3 },
   { id: 'equipe', label: 'Equipe', icon: Users },

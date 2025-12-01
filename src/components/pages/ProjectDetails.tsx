@@ -6,17 +6,97 @@ import { PropertyBank } from '../projects/PropertyBank';
 import { EditPropertyModal } from '../properties/EditPropertyModal';
 import { RegisterActivityModal, ActivityFormData } from '../modals/RegisterActivityModal';
 import { RegisterPlantingModal, PlantingFormData } from '../modals/RegisterPlantingModal';
-import { MapPin, Sprout, Package, Building2 } from 'lucide-react';
+import { MapPin, Sprout, Package, Building2, Plus } from 'lucide-react';
+import { ContractTable } from '../contracts/ContractTable';
+import { InvoiceTable } from '../invoices/InvoiceTable';
+import { Button } from '../ui/button';
+import { CadastrarContratoModal, ContratoFormData } from '../modals/CadastrarContratoModal';
+import { EditContractModal } from '../modals/EditContractModal';
+import { CreateInvoiceModal } from '../invoices/CreateInvoiceModal';
+import { EditInvoiceModal } from '../modals/EditInvoiceModal';
 
 interface ProjectDetailsProps {
   onPageChange?: (page: string) => void;
 }
 
+interface Contract {
+  id: string;
+  name: string;
+  createdBy: string;
+  date: string;
+  fileName: string;
+}
+
+interface Invoice {
+  id: string;
+  number: string;
+  supplier: string;
+  date: string;
+  fileName: string;
+  total: number;
+  category: string;
+  financier?: string;
+  observations?: string;
+}
+
 export function ProjectDetails({ onPageChange }: ProjectDetailsProps = {}) {
+  const isDarkMode = document.documentElement.classList.contains('dark');
   const [isEditPropertyModalOpen, setIsEditPropertyModalOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [isRegisterActivityModalOpen, setIsRegisterActivityModalOpen] = useState(false);
   const [isRegisterPlantingModalOpen, setIsRegisterPlantingModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'contracts' | 'invoices'>('overview');
+  
+  // Contracts state
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
+  const [isEditContractModalOpen, setIsEditContractModalOpen] = useState(false);
+  const [selectedContract, setSelectedContract] = useState<any>(null);
+  const [contracts, setContracts] = useState<Contract[]>([
+    {
+      id: '1',
+      name: 'Contrato de Restauração - Igarapé do Areal',
+      createdBy: 'João Silva',
+      date: '12/10/2024',
+      fileName: 'contrato_igarape_areal.pdf'
+    },
+    {
+      id: '2',
+      name: 'Acordo de Compensação Ambiental',
+      createdBy: 'Maria Santos',
+      date: '08/10/2024',
+      fileName: 'acordo_compensacao.pdf'
+    }
+  ]);
+
+  // Invoices state
+  const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] = useState(false);
+  const [isEditInvoiceModalOpen, setIsEditInvoiceModalOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>([
+    {
+      id: '1',
+      number: 'NF-2024-001',
+      supplier: 'Viveiro Amazônia Verde Ltda',
+      date: '2024-03-15',
+      fileName: 'nota_fiscal_001.pdf',
+      total: 4234.00,
+      category: 'Mudas e Sementes',
+      financier: 'Instituto Chico Mendes',
+      observations: 'Entrega programada para março'
+    },
+    {
+      id: '2',
+      number: 'NF-2024-002',
+      supplier: 'Transportadora Rural Norte',
+      date: '2024-03-18',
+      fileName: 'nota_fiscal_002.pdf',
+      total: 1850.50,
+      category: 'Transporte e Logística',
+      financier: 'BNDES',
+      observations: ''
+    }
+  ]);
+
   // Mock data for the project
   const projectData = {
     name: 'Recuperação do Igarapé do Areal',
@@ -261,6 +341,44 @@ export function ProjectDetails({ onPageChange }: ProjectDetailsProps = {}) {
     setIsRegisterPlantingModalOpen(false);
   };
 
+  const handleAddContract = () => {
+    setIsContractModalOpen(true);
+  };
+
+  const handleEditContract = (contractId: string) => {
+    const contract = contracts.find(c => c.id === contractId);
+    if (contract) {
+      setSelectedContract(contract);
+      setIsEditContractModalOpen(true);
+    }
+  };
+
+  const handleSaveContract = (formData: ContratoFormData) => {
+    console.log('Save contract:', formData);
+    // Here you would normally save to your backend
+    setIsContractModalOpen(false);
+    setIsEditContractModalOpen(false);
+  };
+
+  const handleAddInvoice = () => {
+    setIsCreateInvoiceModalOpen(true);
+  };
+
+  const handleEditInvoice = (invoiceId: string) => {
+    const invoice = invoices.find(i => i.id === invoiceId);
+    if (invoice) {
+      setSelectedInvoice(invoice);
+      setIsEditInvoiceModalOpen(true);
+    }
+  };
+
+  const handleSaveInvoice = (formData: Invoice) => {
+    console.log('Save invoice:', formData);
+    // Here you would normally save to your backend
+    setIsCreateInvoiceModalOpen(false);
+    setIsEditInvoiceModalOpen(false);
+  };
+
   return (
     <div className="p-6 space-y-8 max-w-none">
       {/* Project Header */}
@@ -283,25 +401,114 @@ export function ProjectDetails({ onPageChange }: ProjectDetailsProps = {}) {
         ))}
       </div>
 
-      {/* Main Content Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Left Column - Restoration Models */}
-        <div className="lg:col-span-1">
-          <RestorationModels models={projectData.restorationModels} />
-        </div>
-
-        {/* Right Column - Property Bank */}
-        <div className="lg:col-span-3">
-          <PropertyBank
-            properties={projectData.properties}
-            onEditProperty={handleEditProperty}
-            onRegisterPlanting={handleRegisterPlanting}
-            onRegisterActivity={handleRegisterActivity}
-            onAddProperty={handleAddProperty}
-            onPageChange={onPageChange}
-          />
+      {/* Tabs Navigation */}
+      <div className={`border-b ${isDarkMode ? 'border-[#3A3A3A]' : 'border-[#E0E0E0]'}`}>
+        <div className="flex gap-8">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`pb-3 border-b-2 transition-colors ${
+              activeTab === 'overview'
+                ? 'border-primary text-primary'
+                : isDarkMode
+                  ? 'border-transparent text-gray-400 hover:text-white'
+                  : 'border-transparent text-gray-600 hover:text-[#1A1A1A]'
+            }`}
+          >
+            Visão Geral
+          </button>
+          <button
+            onClick={() => setActiveTab('contracts')}
+            className={`pb-3 border-b-2 transition-colors ${
+              activeTab === 'contracts'
+                ? 'border-primary text-primary'
+                : isDarkMode
+                  ? 'border-transparent text-gray-400 hover:text-white'
+                  : 'border-transparent text-gray-600 hover:text-[#1A1A1A]'
+            }`}
+          >
+            Contratos
+          </button>
+          <button
+            onClick={() => setActiveTab('invoices')}
+            className={`pb-3 border-b-2 transition-colors ${
+              activeTab === 'invoices'
+                ? 'border-primary text-primary'
+                : isDarkMode
+                  ? 'border-transparent text-gray-400 hover:text-white'
+                  : 'border-transparent text-gray-600 hover:text-[#1A1A1A]'
+            }`}
+          >
+            Notas Fiscais
+          </button>
         </div>
       </div>
+
+      {/* Tab Content */}
+      {activeTab === 'overview' && (
+        <>
+          {/* Main Content Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Left Column - Restoration Models */}
+            <div className="lg:col-span-1">
+              <RestorationModels models={projectData.restorationModels} />
+            </div>
+
+            {/* Right Column - Property Bank */}
+            <div className="lg:col-span-3">
+              <PropertyBank
+                properties={projectData.properties}
+                onEditProperty={handleEditProperty}
+                onRegisterPlanting={handleRegisterPlanting}
+                onRegisterActivity={handleRegisterActivity}
+                onAddProperty={handleAddProperty}
+                onPageChange={onPageChange}
+              />
+            </div>
+          </div>
+        </>
+      )}
+
+      {activeTab === 'contracts' && (
+        <div className={`p-6 rounded-[12px] ${
+          isDarkMode ? 'bg-[#2A2A2A]' : 'bg-white border border-[#E0E0E0]'
+        }`}>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold">Contratos</h3>
+            <Button
+              onClick={handleAddContract}
+              className="bg-primary text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Adicionar Contrato
+            </Button>
+          </div>
+          <ContractTable
+            contracts={contracts}
+            onEdit={handleEditContract}
+          />
+        </div>
+      )}
+
+      {activeTab === 'invoices' && (
+        <div className={`p-6 rounded-[12px] ${
+          isDarkMode ? 'bg-[#2A2A2A]' : 'bg-white border border-[#E0E0E0]'
+        }`}>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold">Notas Fiscais</h3>
+            <Button
+              onClick={handleAddInvoice}
+              className="bg-primary text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Adicionar Nota Fiscal
+            </Button>
+          </div>
+          <InvoiceTable
+            invoices={invoices}
+            onEdit={handleEditInvoice}
+          />
+        </div>
+      )}
 
       {/* Edit Property Modal */}
       <EditPropertyModal
@@ -325,6 +532,36 @@ export function ProjectDetails({ onPageChange }: ProjectDetailsProps = {}) {
         onClose={() => setIsRegisterPlantingModalOpen(false)}
         property={selectedProperty}
         onSave={handleSavePlanting}
+      />
+
+      {/* Cadastrar Contrato Modal */}
+      <CadastrarContratoModal
+        isOpen={isContractModalOpen}
+        onClose={() => setIsContractModalOpen(false)}
+        onSave={handleSaveContract}
+      />
+
+      {/* Edit Contract Modal */}
+      <EditContractModal
+        isOpen={isEditContractModalOpen}
+        onClose={() => setIsEditContractModalOpen(false)}
+        contract={selectedContract}
+        onSave={handleSaveContract}
+      />
+
+      {/* Create Invoice Modal */}
+      <CreateInvoiceModal
+        isOpen={isCreateInvoiceModalOpen}
+        onClose={() => setIsCreateInvoiceModalOpen(false)}
+        onSave={handleSaveInvoice}
+      />
+
+      {/* Edit Invoice Modal */}
+      <EditInvoiceModal
+        isOpen={isEditInvoiceModalOpen}
+        onClose={() => setIsEditInvoiceModalOpen(false)}
+        invoice={selectedInvoice}
+        onSave={handleSaveInvoice}
       />
     </div>
   );

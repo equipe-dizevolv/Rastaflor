@@ -1,5 +1,6 @@
 import { X, MapPin } from 'lucide-react';
 import { useState } from 'react';
+import { AddEspecieModal, EspecieFormData } from './AddEspecieModal';
 
 interface AddMatrixModalProps {
   isOpen: boolean;
@@ -26,6 +27,10 @@ export interface MatrixFormData {
   longitude: string;
   matrixPosition: 'isolated' | 'border' | 'trail' | 'inside';
   inCollectionSite: boolean;
+  propertyId?: string;  // Para quando está em local de coleta
+  address?: string;     // Para quando NÃO está em local de coleta
+  city?: string;
+  state?: string;
   
   // Fonte de Sementes
   origin: 'natural' | 'planted';
@@ -33,6 +38,10 @@ export interface MatrixFormData {
   categorySelected: boolean;
   categoryQualified: boolean;
   categoryTested: boolean;
+  selectionCriteria?: string;      // Campos adicionais para Qualificada/Testada
+  selectionIntensity?: string;
+  isolationType?: string;
+  seedGenerationProduction?: string;
   
   // Informações Adicionais
   exsicataCollection: 'yes' | 'no';
@@ -91,8 +100,25 @@ const mockSpecies = [
   },
 ];
 
+// Mock data para propriedades
+const mockProperties = [
+  { id: 'PROP-001', name: 'Fazenda São João' },
+  { id: 'PROP-002', name: 'Sítio Boa Esperança' },
+  { id: 'PROP-003', name: 'Fazenda Santa Clara' },
+  { id: 'PROP-004', name: 'Rancho Verde' },
+  { id: 'PROP-005', name: 'Chácara Recanto das Árvores' }
+];
+
+// Lista de estados brasileiros
+const brazilianStates = [
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 
+  'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 
+  'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+];
+
 export function AddMatrixModal({ isOpen, onClose, onSave }: AddMatrixModalProps) {
   const [currentSection, setCurrentSection] = useState<'data' | 'additional' | 'observations'>('data');
+  const [isEspecieModalOpen, setIsEspecieModalOpen] = useState(false);
   const [formData, setFormData] = useState<MatrixFormData>({
     popularName: '',
     family: '',
@@ -229,6 +255,12 @@ export function AddMatrixModal({ isOpen, onClose, onSave }: AddMatrixModalProps)
     onClose();
   };
 
+  const handleSaveEspecie = (especieData: EspecieFormData) => {
+    // Aqui você pode adicionar a lógica para salvar a espécie no backend
+    // Por enquanto, vamos apenas fechar o modal e mostrar uma mensagem
+    setIsEspecieModalOpen(false);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -318,7 +350,7 @@ export function AddMatrixModal({ isOpen, onClose, onSave }: AddMatrixModalProps)
                       )}
                       <p className="text-xs text-[#777777] dark:text-[#B0B0B0]">
                         Deseja criar uma nova espécie?{' '}
-                        <button type="button" className="text-green-600 hover:underline">
+                        <button type="button" className="text-green-600 hover:underline" onClick={() => setIsEspecieModalOpen(true)}>
                           Clique aqui
                         </button>
                       </p>
@@ -529,6 +561,64 @@ export function AddMatrixModal({ isOpen, onClose, onSave }: AddMatrixModalProps)
                         </button>
                       </label>
                     </div>
+
+                    {formData.inCollectionSite ? (
+                      <div className="col-span-2 space-y-2">
+                        <label className="text-sm text-[#1A1A1A] dark:text-white">ID da Propriedade</label>
+                        <select
+                          value={formData.propertyId}
+                          onChange={(e) => handleChange('propertyId', e.target.value)}
+                          className="w-full h-9 px-3 py-2 bg-[#F8F8F8] dark:bg-[#1E2621] border border-[#E0E0E0] dark:border-border rounded-[8px] text-sm text-[#1A1A1A] dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                        >
+                          <option value="">Selecione uma propriedade...</option>
+                          {mockProperties.map((property) => (
+                            <option key={property.id} value={property.id}>
+                              {property.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="col-span-2 space-y-2">
+                          <label className="text-sm text-[#1A1A1A] dark:text-white">Endereço</label>
+                          <input
+                            type="text"
+                            value={formData.address}
+                            onChange={(e) => handleChange('address', e.target.value)}
+                            placeholder="Ex: Rua das Flores, 123"
+                            className="w-full h-9 px-3 py-2 bg-[#F8F8F8] dark:bg-[#1E2621] border border-[#E0E0E0] dark:border-border rounded-[8px] text-sm text-[#1A1A1A] dark:text-white placeholder:text-[#777777] dark:placeholder:text-[#B0B0B0] focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                          />
+                        </div>
+
+                        <div className="col-span-2 space-y-2">
+                          <label className="text-sm text-[#1A1A1A] dark:text-white">Cidade</label>
+                          <input
+                            type="text"
+                            value={formData.city}
+                            onChange={(e) => handleChange('city', e.target.value)}
+                            placeholder="Ex: São Paulo"
+                            className="w-full h-9 px-3 py-2 bg-[#F8F8F8] dark:bg-[#1E2621] border border-[#E0E0E0] dark:border-border rounded-[8px] text-sm text-[#1A1A1A] dark:text-white placeholder:text-[#777777] dark:placeholder:text-[#B0B0B0] focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                          />
+                        </div>
+
+                        <div className="col-span-2 space-y-2">
+                          <label className="text-sm text-[#1A1A1A] dark:text-white">Estado</label>
+                          <select
+                            value={formData.state}
+                            onChange={(e) => handleChange('state', e.target.value)}
+                            className="w-full h-9 px-3 py-2 bg-[#F8F8F8] dark:bg-[#1E2621] border border-[#E0E0E0] dark:border-border rounded-[8px] text-sm text-[#1A1A1A] dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                          >
+                            <option value="">Selecione um estado...</option>
+                            {brazilianStates.map((state) => (
+                              <option key={state} value={state}>
+                                {state}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -627,6 +717,89 @@ export function AddMatrixModal({ isOpen, onClose, onSave }: AddMatrixModalProps)
                         </label>
                       </div>
                     </div>
+
+                    {/* Campos Adicionais - Aparece quando Qualificada OU Testada estão marcadas */}
+                    {(formData.categoryQualified || formData.categoryTested) && (
+                      <div className="pt-4 border-t border-[#E0E0E0] dark:border-border space-y-4">
+                        <p className="text-sm text-[#777777] dark:text-[#B0B0B0] mb-4">
+                          Informações técnicas para sementes qualificadas/testadas:
+                        </p>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="col-span-2 space-y-2">
+                            <label className="text-sm text-[#1A1A1A] dark:text-white">
+                              Critério de Seleção
+                            </label>
+                            <select
+                              value={formData.selectionCriteria}
+                              onChange={(e) => handleChange('selectionCriteria', e.target.value)}
+                              className="w-full h-9 px-3 py-2 bg-[#F8F8F8] dark:bg-[#1E2621] border border-[#E0E0E0] dark:border-border rounded-[8px] text-sm text-[#1A1A1A] dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                            >
+                              <option value="">Selecione...</option>
+                              <option value="fenotipico">Fenotípico</option>
+                              <option value="genotipico">Genotípico</option>
+                              <option value="produtividade">Produtividade</option>
+                              <option value="resistencia">Resistência a Pragas/Doenças</option>
+                              <option value="adaptacao">Adaptação ao Clima</option>
+                              <option value="qualidade">Qualidade da Madeira</option>
+                            </select>
+                          </div>
+
+                          <div className="col-span-2 space-y-2">
+                            <label className="text-sm text-[#1A1A1A] dark:text-white">
+                              Intensidade de Seleção
+                            </label>
+                            <select
+                              value={formData.selectionIntensity}
+                              onChange={(e) => handleChange('selectionIntensity', e.target.value)}
+                              className="w-full h-9 px-3 py-2 bg-[#F8F8F8] dark:bg-[#1E2621] border border-[#E0E0E0] dark:border-border rounded-[8px] text-sm text-[#1A1A1A] dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                            >
+                              <option value="">Selecione...</option>
+                              <option value="baixa">Baixa (10-20%)</option>
+                              <option value="media">Média (20-40%)</option>
+                              <option value="alta">Alta (40-60%)</option>
+                              <option value="muito-alta">Muito Alta (&gt;60%)</option>
+                            </select>
+                          </div>
+
+                          <div className="col-span-2 space-y-2">
+                            <label className="text-sm text-[#1A1A1A] dark:text-white">
+                              Tipo de Isolamento
+                            </label>
+                            <select
+                              value={formData.isolationType}
+                              onChange={(e) => handleChange('isolationType', e.target.value)}
+                              className="w-full h-9 px-3 py-2 bg-[#F8F8F8] dark:bg-[#1E2621] border border-[#E0E0E0] dark:border-border rounded-[8px] text-sm text-[#1A1A1A] dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                            >
+                              <option value="">Selecione...</option>
+                              <option value="geografico">Geográfico (Distância)</option>
+                              <option value="temporal">Temporal (Época de Floração)</option>
+                              <option value="biologico">Biológico (Polinização Controlada)</option>
+                              <option value="mecanico">Mecânico (Barreiras Físicas)</option>
+                              <option value="sem-isolamento">Sem Isolamento</option>
+                            </select>
+                          </div>
+
+                          <div className="col-span-2 space-y-2">
+                            <label className="text-sm text-[#1A1A1A] dark:text-white">
+                              Geração da Produção de Semente
+                            </label>
+                            <select
+                              value={formData.seedGenerationProduction}
+                              onChange={(e) => handleChange('seedGenerationProduction', e.target.value)}
+                              className="w-full h-9 px-3 py-2 bg-[#F8F8F8] dark:bg-[#1E2621] border border-[#E0E0E0] dark:border-border rounded-[8px] text-sm text-[#1A1A1A] dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                            >
+                              <option value="">Selecione...</option>
+                              <option value="g0">G0 - Geração Original (Pomar de Sementes)</option>
+                              <option value="g1">G1 - Primeira Geração</option>
+                              <option value="g2">G2 - Segunda Geração</option>
+                              <option value="g3">G3 - Terceira Geração</option>
+                              <option value="gx">Gx - Gerações Avançadas</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -821,6 +994,13 @@ export function AddMatrixModal({ isOpen, onClose, onSave }: AddMatrixModalProps)
           </button>
         </div>
       </div>
+
+      {/* Modal de Nova Espécie */}
+      <AddEspecieModal
+        isOpen={isEspecieModalOpen}
+        onClose={() => setIsEspecieModalOpen(false)}
+        onSave={handleSaveEspecie}
+      />
     </div>
   );
 }
