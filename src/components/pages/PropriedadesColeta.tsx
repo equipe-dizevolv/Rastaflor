@@ -98,6 +98,9 @@ export function PropriedadesColeta({ onViewDetails }: PropriedadesColetaProps) {
   const [propertyToEdit, setPropertyToEdit] = useState<PropertyData | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState<PropertyData | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const isDarkMode = false; // Add logic to determine if dark mode is active
 
   const handleViewProperty = (property: PropertyData) => {
     setSelectedProperty(property);
