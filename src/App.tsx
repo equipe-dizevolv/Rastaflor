@@ -1,21 +1,11 @@
-import { AddPropertyModal, PropertyFormData } from './components/modals/AddPropertyModal';
-import { InviteCompanyModal, CompanyFormData } from './components/modals/InviteCompanyModal';
-import { UsageTipsModal } from './components/modals/UsageTipsModal';
-import { ReportBugModal } from './components/modals/ReportBugModal';
-import { useState, useEffect } from 'react';
-import { Toaster } from 'sonner@2.0.3';
+import React, { useState, useEffect } from 'react';
+import { Login } from './components/auth/Login';
+import { ModuleSelection } from './components/auth/ModuleSelection';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
-import { AdminSidebar } from './components/admin/AdminSidebar';
-import { AdminHeader } from './components/admin/AdminHeader';
-import { Login } from './components/auth/Login';
-import { ModuleSelection } from './components/pages/ModuleSelection';
+import { AdminSidebar } from './components/layout/AdminSidebar';
+import { AdminHeader } from './components/layout/AdminHeader';
 import { Dashboard } from './components/pages/Dashboard';
-import { DashboardColeta } from './components/pages/DashboardColeta';
-import { AdminDashboard } from './components/pages/admin/AdminDashboard';
-import { AdminEmpresas } from './components/pages/admin/AdminEmpresas';
-import { AdminUsuarios } from './components/pages/admin/AdminUsuarios';
-import { AdminBugs } from './components/pages/admin/AdminBugs';
 import { Projects } from './components/pages/Projects';
 import { ProjectDetails } from './components/pages/ProjectDetails';
 import { Tasks } from './components/pages/Tasks';
@@ -25,16 +15,31 @@ import { Reports } from './components/pages/Reports';
 import { Settings } from './components/pages/Settings';
 import { Properties } from './components/pages/Properties';
 import { PropertyDetail } from './components/pages/PropertyDetail';
-import { PropriedadesColeta } from './components/pages/PropriedadesColeta';
 import { AddProperty } from './components/pages/AddProperty';
 import { Especies } from './components/pages/Especies';
-import { EspeciesColeta } from './components/pages/EspeciesColeta';
 import { Coletas } from './components/pages/Coletas';
 import { Monitoramentos } from './components/pages/Monitoramentos';
 import { Rotulos } from './components/pages/Rotulos';
 import { Equipe } from './components/pages/Equipe';
+import { EquipeRestauracao } from './components/pages/EquipeRestauracao';
+import { ArvoresMatrizes } from './components/pages/ArvoresMatrizes';
+import { DashboardColeta } from './components/pages/DashboardColeta';
+import { PropriedadesColeta } from './components/pages/PropriedadesColeta';
+import { EspeciesColeta } from './components/pages/EspeciesColeta';
+import { AdminDashboard } from './components/pages/admin/AdminDashboard';
+import { AdminEmpresas } from './components/pages/admin/AdminEmpresas';
+import { AdminUsuarios } from './components/pages/admin/AdminUsuarios';
+import { AdminBugs } from './components/pages/admin/AdminBugs';
+import { AddPropertyModal } from './components/modals/AddPropertyModal';
+import { InviteCompanyModal } from './components/modals/InviteCompanyModal';
+import { UsageTipsModal } from './components/modals/UsageTipsModal';
+import { ReportBugModal } from './components/modals/ReportBugModal';
+import { Toaster } from 'sonner@2.0.3';
 import { RelatoriosColeta } from './components/pages/RelatoriosColeta';
+import { GestaoFinanciamento } from './components/pages/GestaoFinanciamento';
+import { GestaoFornecedores } from './components/pages/GestaoFornecedores';
 import { RelatorioPreview } from './components/pages/RelatorioPreview';
+import { Notifications } from './components/pages/Notifications';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -43,6 +48,21 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "./components/ui/breadcrumb";
+
+interface PropertyFormData {
+  name: string;
+  location: string;
+  area: string;
+  owner: string;
+  coordinates: string;
+}
+
+interface CompanyFormData {
+  name: string;
+  email: string;
+  cnpj: string;
+  phone: string;
+}
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -165,10 +185,20 @@ export default function App() {
         return 'Rótulos';
       case 'equipe':
         return 'Equipe';
+      case 'equipe-restauracao':
+        return 'Equipe';
+      case 'arvores-matrizes':
+        return 'Árvores Matrizes';
+      case 'financiamento':
+        return 'Financiadores';
+      case 'fornecedores':
+        return 'Fornecedores';
       case 'relatorios-coleta':
         return 'Relatórios de Coleta';
       case 'relatorio-preview':
         return 'Visualização de Relatório';
+      case 'notifications':
+        return 'Notificações';
       default:
         return 'Dashboard';
     }
@@ -212,10 +242,20 @@ export default function App() {
         return 'Gerencie os rótulos';
       case 'equipe':
         return 'Gerencie a equipe';
+      case 'equipe-restauracao':
+        return 'Gerencie a equipe de restauração';
+      case 'arvores-matrizes':
+        return 'Gerencie as árvores matrizes';
+      case 'financiamento':
+        return 'Gerencie o financiamento';
+      case 'fornecedores':
+        return 'Gerencie os fornecedores';
       case 'relatorios-coleta':
         return 'Visualize e gere relatórios de coleta';
       case 'relatorio-preview':
         return 'Visualize o relatório de coleta';
+      case 'notifications':
+        return 'Gerencie suas notificações';
       default:
         return '';
     }
@@ -305,6 +345,26 @@ export default function App() {
           { label: 'Início', page: 'dashboard' },
           { label: 'Equipe', page: 'equipe' }
         ];
+      case 'equipe-restauracao':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Equipe', page: 'equipe-restauracao' }
+        ];
+      case 'arvores-matrizes':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Árvores Matrizes', page: 'arvores-matrizes' }
+        ];
+      case 'financiamento':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Financiamento', page: 'financiamento' }
+        ];
+      case 'fornecedores':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Fornecedores', page: 'fornecedores' }
+        ];
       case 'relatorios-coleta':
         return [
           { label: 'Início', page: 'dashboard' },
@@ -315,6 +375,11 @@ export default function App() {
           { label: 'Início', page: 'dashboard' },
           { label: 'Relatórios de Coleta', page: 'relatorios-coleta' },
           { label: 'Visualização de Relatório', page: 'relatorio-preview' }
+        ];
+      case 'notifications':
+        return [
+          { label: 'Início', page: 'dashboard' },
+          { label: 'Notificações', page: 'notifications' }
         ];
       default:
         return [{ label: 'Início', page: 'dashboard' }];
@@ -384,10 +449,20 @@ export default function App() {
         return <Rotulos />;
       case 'equipe':
         return <Equipe />;
+      case 'equipe-restauracao':
+        return <EquipeRestauracao />;
+      case 'arvores-matrizes':
+        return <ArvoresMatrizes />;
+      case 'financiamento':
+        return <GestaoFinanciamento />;
+      case 'fornecedores':
+        return <GestaoFornecedores />;
       case 'relatorios-coleta':
         return <RelatoriosColeta onGenerateReport={() => setCurrentPage('relatorio-preview')} />;
       case 'relatorio-preview':
         return <RelatorioPreview onBack={() => setCurrentPage('relatorios-coleta')} />;
+      case 'notifications':
+        return <Notifications />;
       default:
         return <Dashboard onPageChange={setCurrentPage} />;
     }
@@ -437,6 +512,7 @@ export default function App() {
             isDarkMode={isDarkMode} 
             onToggleTheme={() => setIsDarkMode(!isDarkMode)}
             onLogout={handleLogout}
+            onPageChange={setCurrentPage}
           />
         )}
         

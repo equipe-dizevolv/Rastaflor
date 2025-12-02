@@ -169,6 +169,31 @@ export function MonitoramentosPage() {
     alert('Exportação de lista não implementada');
   };
 
+  // Aplicar filtros aos monitoramentos
+  const filteredMonitorings = monitorings.filter((monitoring) => {
+    const matchesPropriedade = !filters.propriedade || 
+      monitoring.propriedade.toLowerCase().includes(filters.propriedade.toLowerCase());
+    
+    const matchesResponsavel = !filters.responsavel || 
+      monitoring.responsavel.toLowerCase().includes(filters.responsavel.toLowerCase());
+    
+    // Converter data do formato DD/MM/YYYY para comparação
+    const parseDate = (dateStr: string) => {
+      const [day, month, year] = dateStr.split('/');
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    };
+    
+    const monitoringDate = parseDate(monitoring.dataMonitoramento);
+    
+    const matchesDataInicio = !filters.dataInicio || 
+      monitoringDate >= new Date(filters.dataInicio);
+    
+    const matchesDataFim = !filters.dataFim || 
+      monitoringDate <= new Date(filters.dataFim);
+    
+    return matchesPropriedade && matchesResponsavel && matchesDataInicio && matchesDataFim;
+  });
+
   return (
     <div className="px-6 pb-6 space-y-6">
       {/* Page Header */}
@@ -208,17 +233,76 @@ export function MonitoramentosPage() {
         </div>
       </div>
 
+      {/* Filtros - Painel colapsável */}
+      {isFilterOpen && (
+        <div className="bg-white dark:bg-card border border-[#E0E0E0] dark:border-border rounded-[12px] shadow-sm p-6">
+          <h3 className="text-[#1A1A1A] dark:text-white mb-4">Filtros</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm text-[#777777] dark:text-[#B0B0B0] mb-2">
+                Propriedade
+              </label>
+              <input
+                type="text"
+                value={filters.propriedade}
+                onChange={(e) => setFilters({ ...filters, propriedade: e.target.value })}
+                placeholder="Filtrar por propriedade"
+                className="w-full px-3 py-2 rounded-[8px] border border-[#E0E0E0] dark:border-border bg-white dark:bg-background text-[#1A1A1A] dark:text-white placeholder:text-[#777777] dark:placeholder:text-[#B0B0B0] focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-[#777777] dark:text-[#B0B0B0] mb-2">
+                Responsável
+              </label>
+              <input
+                type="text"
+                value={filters.responsavel}
+                onChange={(e) => setFilters({ ...filters, responsavel: e.target.value })}
+                placeholder="Filtrar por responsável"
+                className="w-full px-3 py-2 rounded-[8px] border border-[#E0E0E0] dark:border-border bg-white dark:bg-background text-[#1A1A1A] dark:text-white placeholder:text-[#777777] dark:placeholder:text-[#B0B0B0] focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-[#777777] dark:text-[#B0B0B0] mb-2">
+                Data Início
+              </label>
+              <input
+                type="date"
+                value={filters.dataInicio}
+                onChange={(e) => setFilters({ ...filters, dataInicio: e.target.value })}
+                className="w-full px-3 py-2 rounded-[8px] border border-[#E0E0E0] dark:border-border bg-white dark:bg-background text-[#1A1A1A] dark:text-white placeholder:text-[#777777] dark:placeholder:text-[#B0B0B0] focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-[#777777] dark:text-[#B0B0B0] mb-2">
+                Data Fim
+              </label>
+              <input
+                type="date"
+                value={filters.dataFim}
+                onChange={(e) => setFilters({ ...filters, dataFim: e.target.value })}
+                className="w-full px-3 py-2 rounded-[8px] border border-[#E0E0E0] dark:border-border bg-white dark:bg-background text-[#1A1A1A] dark:text-white placeholder:text-[#777777] dark:placeholder:text-[#B0B0B0] focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center gap-3">
+            <button
+              onClick={() => setFilters({ propriedade: '', responsavel: '', dataInicio: '', dataFim: '' })}
+              className="px-4 py-2 rounded-[8px] border border-[#E0E0E0] dark:border-border text-[#777777] dark:text-[#B0B0B0] hover:bg-[#F8F8F8] dark:hover:bg-[#1E2621] transition-colors text-sm"
+            >
+              Limpar Filtros
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Table Card */}
       <div className="bg-white dark:bg-card border border-[#E0E0E0] dark:border-border rounded-[12px] shadow-sm overflow-hidden">
         {/* Card Header */}
         <div className="p-6 border-b border-[#E0E0E0] dark:border-border flex items-center justify-between">
           <h3 className="text-[#1A1A1A] dark:text-white">
-            Monitoramentos Registrados ({monitorings.length})
+            Monitoramentos Registrados ({filteredMonitorings.length})
           </h3>
-          <button className="px-4 py-2 bg-primary text-primary-foreground rounded-[8px] hover:bg-primary/90 transition-colors flex items-center gap-2 text-sm">
-            <Filter className="w-4 h-4" />
-            <span>Filtros</span>
-          </button>
         </div>
 
         {/* Table */}
@@ -250,7 +334,7 @@ export function MonitoramentosPage() {
               </tr>
             </thead>
             <tbody>
-              {monitorings.map((monitoring) => (
+              {filteredMonitorings.map((monitoring) => (
                 <tr
                   key={monitoring.id}
                   className="border-b border-[#E0E0E0] dark:border-border hover:bg-[#F8F8F8] dark:hover:bg-[#1E2621] transition-colors"
@@ -317,7 +401,7 @@ export function MonitoramentosPage() {
         </div>
 
         {/* Empty State */}
-        {monitorings.length === 0 && (
+        {filteredMonitorings.length === 0 && (
           <div className="p-12 text-center">
             <Eye className="w-12 h-12 text-[#E0E0E0] dark:text-border mx-auto mb-4" />
             <h3 className="text-[#1A1A1A] dark:text-white mb-2">

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { PropertyDetailsColeta } from './PropertyDetailsColeta';
 import { AddPropertyModal, PropertyFormData } from '../modals/AddPropertyModal';
 import { EditPropertyModal, PropertyEditData } from '../modals/EditPropertyModal';
+import { ConfirmDeleteModal } from '../modals/ConfirmDeleteModal';
 
 interface PropertyData {
   id: string;
@@ -95,6 +96,11 @@ export function PropriedadesColeta({ onViewDetails }: PropriedadesColetaProps) {
   const [isAddPropertyModalOpen, setIsAddPropertyModalOpen] = useState(false);
   const [isEditPropertyModalOpen, setIsEditPropertyModalOpen] = useState(false);
   const [propertyToEdit, setPropertyToEdit] = useState<PropertyData | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [propertyToDelete, setPropertyToDelete] = useState<PropertyData | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const isDarkMode = false; // Add logic to determine if dark mode is active
 
   const handleViewProperty = (property: PropertyData) => {
     setSelectedProperty(property);
@@ -157,6 +163,23 @@ export function PropriedadesColeta({ onViewDetails }: PropriedadesColetaProps) {
     }
   };
 
+  const handleOpenDeleteModal = (property: PropertyData) => {
+    setPropertyToDelete(property);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setPropertyToDelete(null);
+  };
+
+  const handleConfirmDelete = () => {
+    if (propertyToDelete) {
+      handleDeleteProperty(propertyToDelete.id, propertyToDelete.name);
+      handleCloseDeleteModal();
+    }
+  };
+
   if (selectedProperty) {
     return <PropertyDetailsColeta property={selectedProperty} onBack={handleBackToList} />;
   }
@@ -174,7 +197,10 @@ export function PropriedadesColeta({ onViewDetails }: PropriedadesColetaProps) {
                 Propriedades Cadastradas ({mockProperties.length})
               </h3>
             </div>
-            <button className="px-3 py-2 rounded-[12px] border border-[#E0E0E0] dark:border-border hover:bg-[#F8F8F8] dark:hover:bg-[#1E2621] transition-colors flex items-center gap-2">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="px-3 py-2 rounded-[12px] border border-[#E0E0E0] dark:border-border hover:bg-[#F8F8F8] dark:hover:bg-[#1E2621] transition-colors flex items-center gap-2"
+            >
               <Filter className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
               <span className="text-sm text-[#777777] dark:text-[#B0B0B0]">Filtros</span>
             </button>
@@ -261,7 +287,7 @@ export function PropriedadesColeta({ onViewDetails }: PropriedadesColetaProps) {
                         <button
                           className="p-2 rounded-[8px] hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                           title="Excluir"
-                          onClick={() => handleDeleteProperty(property.id, property.name)}
+                          onClick={() => handleOpenDeleteModal(property)}
                         >
                           <Trash2 className="w-4 h-4 text-red-600" />
                         </button>
@@ -319,6 +345,17 @@ export function PropriedadesColeta({ onViewDetails }: PropriedadesColetaProps) {
               ],
               documents: []
             }}
+          />
+        )}
+
+        {/* Confirm Delete Modal */}
+        {propertyToDelete && (
+          <ConfirmDeleteModal
+            isOpen={isDeleteModalOpen}
+            onClose={handleCloseDeleteModal}
+            onConfirm={handleConfirmDelete}
+            title="Excluir Propriedade"
+            message={`Tem certeza que deseja excluir a propriedade "${propertyToDelete.name}"?`}
           />
         )}
       </div>

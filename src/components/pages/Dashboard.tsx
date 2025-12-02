@@ -202,16 +202,7 @@ export function Dashboard({ onPageChange }: DashboardProps) {
                     <p>📍 {property.location}</p>
                   </div>
                 </div>
-                <button 
-                  className="text-sm text-foreground hover:underline flex items-center gap-2"
-                  onClick={() => {
-                    setSelectedProperty(property);
-                    setIsEditPropertyModalOpen(true);
-                  }}
-                >
-                  <Edit className="w-4 h-4" />
-                  Editar propriedade
-                </button>
+                {/* Removed edit button as requested */}
               </div>
 
               <div className="mt-4">
