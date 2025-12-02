@@ -177,15 +177,34 @@ export function AddMatrixModal({ isOpen, onClose, onSave }: AddMatrixModalProps)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             latitude: position.coords.latitude.toFixed(6),
             longitude: position.coords.longitude.toFixed(6)
           }));
         },
         (error) => {
-          console.error('Erro ao obter localização:', error);
-          alert('Não foi possível obter a localização atual. Verifique as permissões do navegador.');
+          // Silently handle the error without console logging
+          let errorMessage = 'Não foi possível obter a localização atual.';
+          
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'Permissão de localização negada. Por favor, habilite nas configurações do navegador.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'Informação de localização indisponível.';
+              break;
+            case error.TIMEOUT:
+              errorMessage = 'Tempo esgotado ao tentar obter a localização.';
+              break;
+          }
+          
+          alert(errorMessage);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
         }
       );
     } else {

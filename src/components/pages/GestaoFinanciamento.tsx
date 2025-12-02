@@ -252,13 +252,6 @@ export function GestaoFinanciamento() {
                   <td className="px-4 py-3 text-[14px] whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => handleViewDetails(fin)}
-                        className="p-1.5 text-[#777777] hover:text-[#0F3D26] hover:bg-[#F0F0F0] rounded-lg transition-colors"
-                        title="Ver detalhes"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
                         onClick={() => handleEditFinanciamento(fin)}
                         className="p-1.5 text-[#777777] hover:text-[#0F3D26] hover:bg-[#F0F0F0] rounded-lg transition-colors"
                         title="Editar"

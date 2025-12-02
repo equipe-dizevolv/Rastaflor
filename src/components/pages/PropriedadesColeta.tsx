@@ -197,7 +197,10 @@ export function PropriedadesColeta({ onViewDetails }: PropriedadesColetaProps) {
                 Propriedades Cadastradas ({mockProperties.length})
               </h3>
             </div>
-            <button className="px-3 py-2 rounded-[12px] border border-[#E0E0E0] dark:border-border hover:bg-[#F8F8F8] dark:hover:bg-[#1E2621] transition-colors flex items-center gap-2">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="px-3 py-2 rounded-[12px] border border-[#E0E0E0] dark:border-border hover:bg-[#F8F8F8] dark:hover:bg-[#1E2621] transition-colors flex items-center gap-2"
+            >
               <Filter className="w-4 h-4 text-[#777777] dark:text-[#B0B0B0]" />
               <span className="text-sm text-[#777777] dark:text-[#B0B0B0]">Filtros</span>
             </button>
