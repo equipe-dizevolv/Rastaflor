@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Login } from './components/auth/Login';
+import { useAuth } from './contexts/AuthContext';
 import { ModuleSelection } from './components/auth/ModuleSelection';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
@@ -65,7 +66,8 @@ interface CompanyFormData {
 }
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user, profile, loading } = useAuth();
+  const isAuthenticated = !!user;
   const [moduleSelected, setModuleSelected] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
@@ -467,6 +469,15 @@ export default function App() {
         return <Dashboard onPageChange={setCurrentPage} />;
     }
   };
+
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f3d26] via-[#1a4d32] to-[#0a2a1a]">
+        <div className="text-white text-xl">Carregando...</div>
+      </div>
+    );
+  }
 
   // Login screen
   if (!isAuthenticated) {

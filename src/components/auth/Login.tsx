@@ -6,12 +6,14 @@ import { Button } from '../ui/button';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import rastaFlorLogo from 'figma:asset/9c14cc3ff4bd6d87486f75d6184b5bc3e4d36350.png';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface LoginProps {
   onLogin: () => void;
 }
 
 export function Login({ onLogin }: LoginProps) {
+  const { signIn, requestPasswordReset } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -21,32 +23,36 @@ export function Login({ onLogin }: LoginProps) {
   const [resetEmail, setResetEmail] = useState('');
   const [resetSuccess, setResetSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    // Simula um delay de autenticação
-    setTimeout(() => {
-      if (email === 'admin' && password === '1234') {
-        onLogin();
-      } else {
-        setError('Email ou senha incorretos. Tente novamente.');
-        setIsLoading(false);
-      }
-    }, 800);
+    try {
+      await signIn(email, password);
+      onLogin();
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Email ou senha incorretos. Por favor, tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleForgotPassword = (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    // Simula um delay de recuperação de senha
-    setTimeout(() => {
+    try {
+      await requestPasswordReset(resetEmail);
       setResetSuccess(true);
+    } catch (err: any) {
+      console.error('Password reset error:', err);
+      setError(err.message || 'Erro ao enviar email de recuperação. Tente novamente.');
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
   const handleBackToLogin = () => {

@@ -20,6 +20,7 @@
         'figma:asset/98f13613464bb8a33ef6040f23a332d0526a80ef.png': path.resolve(__dirname, './src/assets/98f13613464bb8a33ef6040f23a332d0526a80ef.png'),
         'figma:asset/67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c.png': path.resolve(__dirname, './src/assets/67aa7b1ef27bf90ec544aed2b26b2cf8bfa7631c.png'),
         'figma:asset/0fa023c328aff1bf46c62cfbbb2ee77cbaeb369b.png': path.resolve(__dirname, './src/assets/0fa023c328aff1bf46c62cfbbb2ee77cbaeb369b.png'),
+        'figma:asset/9c14cc3ff4bd6d87486f75d6184b5bc3e4d36350.png': path.resolve(__dirname, './public/rastaflor-logo.png'),
         'embla-carousel-react@8.6.0': 'embla-carousel-react',
         'cmdk@1.1.1': 'cmdk',
         'class-variance-authority@0.7.1': 'class-variance-authority',

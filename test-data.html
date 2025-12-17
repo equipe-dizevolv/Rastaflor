@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Supabase Data</title>
+</head>
+<body>
+  <h1>Testing Supabase Data</h1>
+  <button onclick="testData()">Check Data</button>
+  <pre id="result"></pre>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+    const supabaseUrl = 'https://ixmfpxhkmfrrwuggdzcb.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bWZweGhrbWZycnd1Z2dkemNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3MzI3NTAsImV4cCI6MjA3OTMwODc1MH0.hsckDrgoOsvNqK9IJR2bgdKJWI5KjACWrvj7OF4JpT0'
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    window.testData = async function() {
+      const resultEl = document.getElementById('result')
+      resultEl.textContent = 'Checking data...\n\n'
+
+      try {
+        // Login first
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email: 'davicampos.dizevolv@gmail.com',
+          password: 'asd123'
+        })
+
+        if (authError) {
+          resultEl.textContent += `❌ Auth failed: ${authError.message}\n`
+          return
+        }
+
+        resultEl.textContent += `✅ Logged in as: ${authData.user.email}\n\n`
+
+        // Check companies
+        resultEl.textContent += '1. Checking COMPANIES table:\n'
+        const { data: companies, error: compError } = await supabase
+          .from('companies')
+          .select('*')
+
+        resultEl.textContent += `   Count: ${companies?.length || 0}\n`
+        resultEl.textContent += `   Data: ${JSON.stringify(companies, null, 2)}\n\n`
+
+        // Check users
+        resultEl.textContent += '2. Checking USERS table:\n'
+        const { data: users, error: usersError } = await supabase
+          .from('users')
+          .select('*')
+
+        resultEl.textContent += `   Count: ${users?.length || 0}\n`
+        resultEl.textContent += `   Data: ${JSON.stringify(users, null, 2)}\n\n`
+
+        // Check profile with company
+        resultEl.textContent += '3. Checking USER PROFILE with COMPANY (like the app does):\n'
+        const { data: profile, error: profileError } = await supabase
+          .from('users')
+          .select(`
+            *,
+            company:companies(*)
+          `)
+          .eq('email', 'davicampos.dizevolv@gmail.com')
+          .single()
+
+        if (profileError) {
+          resultEl.textContent += `   ❌ Error: ${profileError.message}\n`
+          resultEl.textContent += `   Details: ${JSON.stringify(profileError, null, 2)}\n`
+        } else {
+          resultEl.textContent += `   ✅ Profile found:\n`
+          resultEl.textContent += `   ${JSON.stringify(profile, null, 2)}\n`
+        }
+
+      } catch (err) {
+        resultEl.textContent += `\n❌ Exception: ${err.message}\n`
+      }
+    }
+  </script>
+</body>
+</html>
