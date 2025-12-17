@@ -54,7 +54,7 @@ BEGIN
     SELECT 1 FROM pg_constraint WHERE conname = 'users_role_check'
   ) THEN
     ALTER TABLE users ADD CONSTRAINT users_role_check
-      CHECK (role IN ('admin', 'manager', 'technician', 'viewer'));
+      CHECK (role IN ('admin', 'financial', 'technician', 'viewer'));
   END IF;
 END $$;
 
@@ -99,7 +99,7 @@ CREATE POLICY "Admins can insert company users"
     company_id = get_user_company_id()
     AND EXISTS (
       SELECT 1 FROM users
-      WHERE id = auth.uid() AND role IN ('admin', 'manager')
+      WHERE id = auth.uid() AND role = 'admin'
     )
   );
 
@@ -110,7 +110,7 @@ CREATE POLICY "Admins can update company users"
     company_id = get_user_company_id()
     AND EXISTS (
       SELECT 1 FROM users
-      WHERE id = auth.uid() AND role IN ('admin', 'manager')
+      WHERE id = auth.uid() AND role = 'admin'
     )
   );
 

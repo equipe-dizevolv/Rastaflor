@@ -7,8 +7,8 @@ import { TeamMember } from '../../types/user.types';
 const roleToFuncao = (role: string): string => {
   const mapping: Record<string, string> = {
     'admin': 'Administrador',
-    'manager': 'Coordenador de Campo',
-    'technician': 'Técnico(a) de Coleta',
+    'financial': 'Financeiro',
+    'technician': 'Técnico',
     'viewer': 'Visualizador'
   };
   return mapping[role] || role;
@@ -248,11 +248,11 @@ interface AddMemberModalProps {
 }
 
 // Map funcao to role
-const funcaoToRole = (funcao: string): 'admin' | 'manager' | 'technician' | 'viewer' => {
-  const mapping: Record<string, 'admin' | 'manager' | 'technician' | 'viewer'> = {
+const funcaoToRole = (funcao: string): 'admin' | 'financial' | 'technician' | 'viewer' => {
+  const mapping: Record<string, 'admin' | 'financial' | 'technician' | 'viewer'> = {
     'Administrador': 'admin',
-    'Coordenador de Campo': 'manager',
-    'Técnico(a) de Coleta': 'technician',
+    'Financeiro': 'financial',
+    'Técnico': 'technician',
     'Visualizador': 'viewer'
   };
   return mapping[funcao] || 'viewer';
@@ -264,8 +264,8 @@ function AddMemberModal({ isOpen, onClose, member, onSave }: AddMemberModalProps
     name: member?.name || '',
     email: member?.email || '',
     phone: member?.phone || '',
-    role: member?.role || 'technician',
-    is_active: member?.is_active ?? true,
+    role: member?.role || '',
+    is_active: member?.is_active ?? '',
     admission_date: member?.admission_date || new Date().toISOString().split('T')[0]
   });
   const [saving, setSaving] = useState(false);
@@ -337,10 +337,11 @@ function AddMemberModal({ isOpen, onClose, member, onSave }: AddMemberModalProps
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Digite o nome completo"
                 className={`w-full rounded-[8px] px-3 py-2 border ${
                   isDarkMode
-                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white'
-                    : 'bg-white border-[#E0E0E0]'
+                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white placeholder-gray-500'
+                    : 'bg-white border-[#E0E0E0] placeholder-gray-400'
                 }`}
                 required
                 disabled={saving}
@@ -357,10 +358,11 @@ function AddMemberModal({ isOpen, onClose, member, onSave }: AddMemberModalProps
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="exemplo@email.com"
                 className={`w-full rounded-[8px] px-3 py-2 border ${
                   isDarkMode
-                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white'
-                    : 'bg-white border-[#E0E0E0]'
+                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white placeholder-gray-500'
+                    : 'bg-white border-[#E0E0E0] placeholder-gray-400'
                 }`}
                 required
                 disabled={saving}
@@ -376,11 +378,26 @@ function AddMemberModal({ isOpen, onClose, member, onSave }: AddMemberModalProps
               <input
                 type="tel"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  let formatted = value;
+                  if (value.length > 0) {
+                    formatted = `(${value.substring(0, 2)}`;
+                    if (value.length > 2) {
+                      formatted += `) ${value.substring(2, 7)}`;
+                    }
+                    if (value.length > 7) {
+                      formatted += `-${value.substring(7, 11)}`;
+                    }
+                  }
+                  setFormData({ ...formData, phone: formatted });
+                }}
+                placeholder="(00) 00000-0000"
+                maxLength={15}
                 className={`w-full rounded-[8px] px-3 py-2 border ${
                   isDarkMode
-                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white'
-                    : 'bg-white border-[#E0E0E0]'
+                    ? 'bg-[#1A1A1A] border-[#3A3A3A] text-white placeholder-gray-500'
+                    : 'bg-white border-[#E0E0E0] placeholder-gray-400'
                 }`}
                 disabled={saving}
               />
@@ -403,9 +420,10 @@ function AddMemberModal({ isOpen, onClose, member, onSave }: AddMemberModalProps
                 required
                 disabled={saving}
               >
+                <option value="" disabled hidden>Selecione uma função</option>
                 <option value="admin">Administrador</option>
-                <option value="manager">Coordenador de Campo</option>
-                <option value="technician">Técnico(a) de Coleta</option>
+                <option value="financial">Financeiro</option>
+                <option value="technician">Técnico</option>
                 <option value="viewer">Visualizador</option>
               </select>
             </div>
@@ -417,7 +435,7 @@ function AddMemberModal({ isOpen, onClose, member, onSave }: AddMemberModalProps
                 Status *
               </label>
               <select
-                value={formData.is_active ? 'ativo' : 'inativo'}
+                value={formData.is_active === '' ? '' : formData.is_active ? 'ativo' : 'inativo'}
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.value === 'ativo' })}
                 className={`w-full rounded-[8px] px-3 py-2 border ${
                   isDarkMode
@@ -427,6 +445,7 @@ function AddMemberModal({ isOpen, onClose, member, onSave }: AddMemberModalProps
                 required
                 disabled={saving}
               >
+                <option value="" disabled hidden>Selecione um status</option>
                 <option value="ativo">Ativo</option>
                 <option value="inativo">Inativo</option>
               </select>

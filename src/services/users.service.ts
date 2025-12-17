@@ -60,8 +60,8 @@ export const usersService = {
 
     if (!currentUser) throw new Error('Perfil de usuário não encontrado')
 
-    // Check if current user has permission (admin or manager)
-    if (!['admin', 'manager'].includes(currentUser.role)) {
+    // Check if current user has permission (admin only)
+    if (currentUser.role !== 'admin') {
       throw new Error('Você não tem permissão para adicionar membros à equipe')
     }
 
