@@ -1,13 +1,16 @@
 import { X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface AddSpeciesModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (species: SpeciesFormData) => void;
+  editMode?: boolean;
+  initialData?: SpeciesFormData;
 }
 
 export interface SpeciesFormData {
+  id?: string;
   popularName: string;
   scientificName: string;
   family: string;
@@ -18,7 +21,7 @@ export interface SpeciesFormData {
   description: string;
 }
 
-export function AddSpeciesModal({ isOpen, onClose, onSave }: AddSpeciesModalProps) {
+export function AddSpeciesModal({ isOpen, onClose, onSave, editMode = false, initialData }: AddSpeciesModalProps) {
   const [formData, setFormData] = useState<SpeciesFormData>({
     popularName: '',
     scientificName: '',
@@ -29,6 +32,23 @@ export function AddSpeciesModal({ isOpen, onClose, onSave }: AddSpeciesModalProp
     conservationStatus: '',
     description: ''
   });
+
+  useEffect(() => {
+    if (editMode && initialData) {
+      setFormData(initialData);
+    } else {
+      setFormData({
+        popularName: '',
+        scientificName: '',
+        family: '',
+        genus: '',
+        biome: '',
+        category: '',
+        conservationStatus: '',
+        description: ''
+      });
+    }
+  }, [editMode, initialData, isOpen]);
 
   const [errors, setErrors] = useState<Partial<Record<keyof SpeciesFormData, string>>>({});
 
@@ -86,11 +106,13 @@ export function AddSpeciesModal({ isOpen, onClose, onSave }: AddSpeciesModalProp
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-card rounded-[12px] shadow-xl max-w-[896px] w-full max-h-[90vh] overflow-hidden border border-[#E0E0E0] dark:border-border">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-white dark:bg-card rounded-[12px] shadow-xl max-w-[896px] w-full max-h-[90vh] flex flex-col border border-[#E0E0E0] dark:border-border">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#E0E0E0] dark:border-border bg-primary">
-          <h2 className="text-white text-lg">Adicionar Nova Espécie</h2>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#E0E0E0] dark:border-border bg-primary flex-shrink-0">
+          <h2 className="text-white text-lg">
+            {editMode ? 'Editar Espécie' : 'Adicionar Nova Espécie'}
+          </h2>
           <button
             onClick={handleCancel}
             className="w-5 h-5 flex items-center justify-center text-white hover:text-white/70 transition-colors"
@@ -100,8 +122,8 @@ export function AddSpeciesModal({ isOpen, onClose, onSave }: AddSpeciesModalProp
         </div>
 
         {/* Content */}
-        <form onSubmit={handleSubmit} className="flex flex-col">
-          <div className="overflow-auto p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <div className="overflow-y-auto flex-1 p-6 space-y-6">
             {/* Section: Identificação */}
             <div>
               <h3 className="text-[#1A1A1A] dark:text-white mb-4">Identificação</h3>
@@ -271,7 +293,7 @@ export function AddSpeciesModal({ isOpen, onClose, onSave }: AddSpeciesModalProp
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#E0E0E0] dark:border-border bg-[#F8F8F8] dark:bg-[#0F3D26]">
+          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#E0E0E0] dark:border-border bg-[#F8F8F8] dark:bg-[#0F3D26] flex-shrink-0">
             <button
               type="button"
               onClick={handleCancel}
@@ -283,7 +305,7 @@ export function AddSpeciesModal({ isOpen, onClose, onSave }: AddSpeciesModalProp
               type="submit"
               className="px-4 py-2 bg-primary text-primary-foreground rounded-[8px] hover:bg-primary/90 transition-colors text-sm"
             >
-              Salvar Espécie
+              {editMode ? 'Atualizar Espécie' : 'Salvar Espécie'}
             </button>
           </div>
         </form>

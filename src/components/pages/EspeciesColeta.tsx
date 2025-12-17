@@ -1,108 +1,117 @@
 import { Plus, Search, Eye, Edit, Trash2, Sprout } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AddSpeciesModal, SpeciesFormData } from '../modals/AddSpeciesModal';
-
-interface Species {
-  id: string;
-  popularName: string;
-  scientificName: string;
-  family: string;
-  status: 'Ativa' | 'Inativa';
-}
+import { ViewSpeciesModal } from '../modals/ViewSpeciesModal';
+import { speciesService } from '../../services/species.service';
+import { Species } from '../../types/species.types';
+import { useAuth } from '../../contexts/AuthContext';
 
 export function EspeciesColeta() {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [species, setSpecies] = useState<Species[]>([
-    {
-      id: '1',
-      popularName: 'Ipê-amarelo',
-      scientificName: 'Handroanthus chrysotrichus',
-      family: 'Bignoniaceae',
-      status: 'Ativa'
-    },
-    {
-      id: '2',
-      popularName: 'Pau-brasil',
-      scientificName: 'Paubrasilia echinata',
-      family: 'Fabaceae',
-      status: 'Ativa'
-    },
-    {
-      id: '3',
-      popularName: 'Jatobá',
-      scientificName: 'Hymenaea courbaril',
-      family: 'Fabaceae',
-      status: 'Ativa'
-    },
-    {
-      id: '4',
-      popularName: 'Cedro',
-      scientificName: 'Cedrela fissilis',
-      family: 'Meliaceae',
-      status: 'Ativa'
-    },
-    {
-      id: '5',
-      popularName: 'Araucária',
-      scientificName: 'Araucaria angustifolia',
-      family: 'Araucariaceae',
-      status: 'Ativa'
-    },
-    {
-      id: '6',
-      popularName: 'Jacarandá-da-bahia',
-      scientificName: 'Dalbergia nigra',
-      family: 'Fabaceae',
-      status: 'Ativa'
-    },
-    {
-      id: '7',
-      popularName: 'Peroba-rosa',
-      scientificName: 'Aspidosperma polyneuron',
-      family: 'Apocynaceae',
-      status: 'Ativa'
-    },
-    {
-      id: '8',
-      popularName: 'Mogno',
-      scientificName: 'Swietenia macrophylla',
-      family: 'Meliaceae',
-      status: 'Ativa'
-    }
-  ]);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null);
+  const [species, setSpecies] = useState<Species[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAddSpecies = (data: SpeciesFormData) => {
-    const newSpecies: Species = {
-      id: `species-${Date.now()}`,
-      popularName: data.popularName,
-      scientificName: data.scientificName,
-      family: data.family,
-      status: 'Ativa'
-    };
-    setSpecies([...species, newSpecies]);
-    setIsAddModalOpen(false);
+  // Load species on component mount
+  useEffect(() => {
+    if (user) {
+      loadSpecies();
+    }
+  }, [user]);
+
+  const loadSpecies = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await speciesService.getAll({ is_active: true });
+      setSpecies(data);
+    } catch (err) {
+      console.error('Error loading species:', err);
+      setError('Erro ao carregar espécies. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeleteSpecies = (id: string) => {
+  const handleAddSpecies = async (data: SpeciesFormData) => {
+    try {
+      await speciesService.create({
+        popular_name: data.popularName,
+        scientific_name: data.scientificName,
+        family: data.family,
+        genus: data.genus,
+        biome: data.biome,
+        category: data.category,
+        conservation_status: data.conservationStatus,
+        description: data.description,
+      });
+      setIsAddModalOpen(false);
+      await loadSpecies(); // Reload the list
+    } catch (err) {
+      console.error('Error creating species:', err);
+      alert('Erro ao criar espécie. Tente novamente.');
+    }
+  };
+
+  const handleUpdateSpecies = async (data: SpeciesFormData) => {
+    if (!data.id) return;
+
+    try {
+      await speciesService.update(data.id, {
+        popular_name: data.popularName,
+        scientific_name: data.scientificName,
+        family: data.family,
+        genus: data.genus,
+        biome: data.biome,
+        category: data.category,
+        conservation_status: data.conservationStatus,
+        description: data.description,
+      });
+      setIsEditModalOpen(false);
+      setSelectedSpecies(null);
+      await loadSpecies(); // Reload the list
+    } catch (err) {
+      console.error('Error updating species:', err);
+      alert('Erro ao atualizar espécie. Tente novamente.');
+    }
+  };
+
+  const handleDeleteSpecies = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir esta espécie?')) {
-      setSpecies(species.filter(s => s.id !== id));
+      try {
+        await speciesService.delete(id);
+        await loadSpecies(); // Reload the list
+      } catch (err) {
+        console.error('Error deleting species:', err);
+        alert('Erro ao excluir espécie. Tente novamente.');
+      }
     }
   };
 
   const handleViewSpecies = (id: string) => {
-    console.log('Visualizar espécie ID:', id);
-    // TODO: Abrir modal de visualização
+    const specie = species.find(s => s.id === id);
+    if (specie) {
+      setSelectedSpecies(specie);
+      setIsViewModalOpen(true);
+    }
   };
 
   const handleEditSpecies = (id: string) => {
-    console.log('Editar espécie ID:', id);
-    // TODO: Abrir modal de edição
+    const specie = species.find(s => s.id === id);
+    if (specie) {
+      setSelectedSpecies(specie);
+      setIsEditModalOpen(true);
+    }
   };
 
   const filteredSpecies = species.filter(s =>
-    s.popularName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.scientificName.toLowerCase().includes(searchQuery.toLowerCase())
+    s.popular_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.scientific_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -126,6 +135,13 @@ export function EspeciesColeta() {
 
       {/* Content Area */}
       <div className="flex-1 overflow-auto p-6">
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-[8px]">
+            <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+          </div>
+        )}
+
         {/* Search Bar */}
         <div className="mb-6 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#777777] dark:text-[#B0B0B0]" />
@@ -138,10 +154,16 @@ export function EspeciesColeta() {
           />
         </div>
 
-        {/* Species Card */}
-        <div className="bg-white dark:bg-card rounded-[12px] border border-[#E0E0E0] dark:border-border overflow-hidden">
-          {/* Card Header */}
-          <div className="px-4 py-3 border-b border-[#E0E0E0] dark:border-border">
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <p className="text-[#777777] dark:text-[#B0B0B0]">Carregando espécies...</p>
+          </div>
+        ) : (
+          /* Species Card */
+          <div className="bg-white dark:bg-card rounded-[12px] border border-[#E0E0E0] dark:border-border overflow-hidden">
+            {/* Card Header */}
+            <div className="px-4 py-3 border-b border-[#E0E0E0] dark:border-border">
             <div className="flex items-center gap-2">
               <Sprout className="w-5 h-5 text-green-600" />
               <h2 className="text-[#1A1A1A] dark:text-white">
@@ -188,10 +210,10 @@ export function EspeciesColeta() {
                       className="border-t border-[#E0E0E0] dark:border-border hover:bg-[#F8F8F8] dark:hover:bg-[#1E2621] transition-colors"
                     >
                       <td className="px-4 py-3 text-sm text-[#1A1A1A] dark:text-white">
-                        {specie.popularName}
+                        {specie.popular_name}
                       </td>
                       <td className="px-4 py-3 text-sm text-[#1A1A1A] dark:text-white italic">
-                        {specie.scientificName}
+                        {specie.scientific_name}
                       </td>
                       <td className="px-4 py-3 text-sm text-[#1A1A1A] dark:text-white">
                         {specie.family}
@@ -199,12 +221,12 @@ export function EspeciesColeta() {
                       <td className="px-4 py-3">
                         <span
                           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs ${
-                            specie.status === 'Ativa'
+                            specie.is_active
                               ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                               : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
                           }`}
                         >
-                          {specie.status}
+                          {specie.is_active ? 'Ativa' : 'Inativa'}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -239,6 +261,7 @@ export function EspeciesColeta() {
             </table>
           </div>
         </div>
+        )}
       </div>
 
       {/* Add Species Modal */}
@@ -246,6 +269,48 @@ export function EspeciesColeta() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleAddSpecies}
+      />
+
+      {/* Edit Species Modal */}
+      <AddSpeciesModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedSpecies(null);
+        }}
+        onSave={handleUpdateSpecies}
+        editMode={true}
+        initialData={selectedSpecies ? {
+          id: selectedSpecies.id,
+          popularName: selectedSpecies.popular_name,
+          scientificName: selectedSpecies.scientific_name,
+          family: selectedSpecies.family,
+          genus: selectedSpecies.genus || '',
+          biome: selectedSpecies.biome || '',
+          category: selectedSpecies.category || '',
+          conservationStatus: selectedSpecies.conservation_status || '',
+          description: selectedSpecies.description || ''
+        } : undefined}
+      />
+
+      {/* View Species Modal */}
+      <ViewSpeciesModal
+        isOpen={isViewModalOpen}
+        onClose={() => {
+          setIsViewModalOpen(false);
+          setSelectedSpecies(null);
+        }}
+        species={selectedSpecies ? {
+          id: selectedSpecies.id,
+          popularName: selectedSpecies.popular_name,
+          scientificName: selectedSpecies.scientific_name,
+          family: selectedSpecies.family,
+          genus: selectedSpecies.genus || '',
+          biome: selectedSpecies.biome || '',
+          category: selectedSpecies.category || '',
+          conservationStatus: selectedSpecies.conservation_status || '',
+          description: selectedSpecies.description || ''
+        } : null}
       />
     </div>
   );
